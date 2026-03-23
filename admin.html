@@ -1,0 +1,3041 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — Le Petit Virevent</title>
+<!-- ── SÉCURITÉ ADMIN ── -->
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="Referrer-Policy" content="no-referrer">
+<meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; frame-src 'none'; form-action 'self';">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;1,300&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0D0B08;--bg2:#141210;--bg3:#1C1915;--bg4:#221F1A;
+  --gold:#C8955A;--gold-light:#E8B87A;--gold-dim:rgba(200,149,90,0.12);
+  --jade:#4A7C6A;--jade-light:#6BA090;
+  --stone:#8C7B6A;--stone-light:#B5A090;
+  --cream:#F0EAE0;--red:#C0392B;--green:#27735A;
+  --border:rgba(200,149,90,0.13);--border2:rgba(200,149,90,0.28);
+}
+body{font-family:'DM Sans',sans-serif;font-weight:300;background:var(--bg);color:var(--cream);min-height:100vh}
+
+/* ── LOGIN ── */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
+.login-box{width:100%;max-width:420px;border:0.5px solid var(--border2);background:var(--bg2);padding:3rem}
+.login-logo{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:300;color:var(--gold);margin-bottom:0.5rem}
+.login-sub{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--stone);margin-bottom:2.5rem}
+.login-label{font-size:0.6rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--stone);margin-bottom:0.4rem;display:block}
+.login-input{width:100%;background:var(--bg3);border:0.5px solid var(--border2);padding:0.9rem 1rem;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:300;outline:none;margin-bottom:1.25rem}
+.login-input:focus{border-color:var(--gold)}
+.login-btn{width:100%;padding:0.9rem;background:var(--gold);color:var(--bg);border:none;font-family:'DM Sans',sans-serif;font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;cursor:pointer;transition:background 0.2s}
+.login-btn:hover{background:var(--gold-light)}
+.login-err{font-size:0.72rem;color:#E07060;margin-top:0.75rem;min-height:1.2rem}
+.otp-info{font-size:0.72rem;color:var(--stone-light);line-height:1.6;margin-bottom:1.25rem;padding:0.75rem;background:var(--gold-dim);border-left:2px solid var(--gold)}
+
+/* ── LAYOUT ── */
+#app{display:none;min-height:100vh}
+.sidebar{width:220px;background:var(--bg2);border-right:0.5px solid var(--border);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column}
+.sb-logo{padding:1.75rem 1.5rem;border-bottom:0.5px solid var(--border)}
+.sb-logo-name{font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold)}
+.sb-logo-tag{font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--stone);margin-top:0.2rem}
+.sb-nav{flex:1;padding:1rem 0;overflow-y:auto}
+.sb-section{font-size:0.55rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--stone);padding:1rem 1.5rem 0.5rem}
+.sb-link{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1.5rem;font-size:0.75rem;color:var(--stone-light);cursor:pointer;transition:all 0.15s;border-left:2px solid transparent}
+.sb-link:hover{color:var(--cream);background:var(--bg3)}
+.sb-link.active{color:var(--gold);border-left-color:var(--gold);background:var(--gold-dim)}
+.sb-link svg{width:15px;height:15px;flex-shrink:0}
+.sb-footer{padding:1rem 1.5rem;border-top:0.5px solid var(--border)}
+.sb-logout{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--stone);cursor:pointer;transition:color 0.2s}
+.sb-logout:hover{color:var(--cream)}
+.main{margin-left:220px;padding:2.5rem;min-height:100vh}
+.page{display:none}
+.page.active{display:block}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem}
+.page-title{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:300;color:var(--cream)}
+.page-sub{font-size:0.72rem;color:var(--stone-light);margin-top:0.2rem}
+.save-btn{padding:0.65rem 1.75rem;background:var(--gold);color:var(--bg);border:none;font-family:'DM Sans',sans-serif;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;transition:background 0.2s}
+.save-btn:hover{background:var(--gold-light)}
+
+/* ── CARDS ── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:2.5rem}
+.stat{background:var(--bg2);border:0.5px solid var(--border);padding:1.25rem}
+.stat-label{font-size:0.58rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--stone);margin-bottom:0.5rem}
+.stat-val{font-family:'Playfair Display',serif;font-size:2rem;font-weight:300;color:var(--cream)}
+.stat-val.gold{color:var(--gold)}
+.stat-val.jade{color:var(--jade-light)}
+.stat-sub{font-size:0.65rem;color:var(--stone);margin-top:0.25rem}
+
+/* ── SECTION CARD ── */
+.card{background:var(--bg2);border:0.5px solid var(--border);padding:1.75rem;margin-bottom:1.5rem}
+.card-title{font-size:0.62rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem;padding-bottom:0.75rem;border-bottom:0.5px solid var(--border)}
+
+/* ── FORM ELEMENTS ── */
+.field-group{margin-bottom:1.25rem}
+.field-label{font-size:0.58rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--stone);margin-bottom:0.4rem;display:block}
+.field-input{width:100%;background:var(--bg3);border:0.5px solid var(--border2);padding:0.75rem 0.9rem;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:300;outline:none}
+.field-input:focus{border-color:var(--gold)}
+.field-input[type=color]{padding:0.3rem;height:38px;cursor:pointer}
+.field-input[type=number]{-moz-appearance:textfield}
+select.field-input{appearance:none;cursor:pointer}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+
+/* ── COLOR GRID ── */
+.color-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.color-field{display:flex;flex-direction:column;gap:0.4rem}
+.color-preview{display:flex;align-items:center;gap:0.6rem}
+.color-swatch{width:28px;height:28px;border:0.5px solid var(--border2);flex-shrink:0}
+
+/* ── PHOTO GRID ── */
+
+
+/* ── TABLE ── */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:0.55rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--stone);padding:0.6rem 0.75rem;text-align:left;border-bottom:0.5px solid var(--border)}
+.data-table td{font-size:0.75rem;color:var(--cream);padding:0.75rem;border-bottom:0.5px solid var(--border);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:0.2rem 0.6rem;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase}
+.badge.gold{background:var(--gold-dim);color:var(--gold)}
+.badge.jade{background:rgba(74,124,106,0.15);color:var(--jade-light)}
+.badge.red{background:rgba(192,57,43,0.15);color:#E07060}
+.badge.gray{background:rgba(140,123,106,0.15);color:var(--stone-light)}
+.action-btn{padding:0.3rem 0.75rem;border:0.5px solid var(--border2);background:transparent;color:var(--stone-light);font-family:'DM Sans',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:all 0.2s}
+.action-btn:hover{border-color:var(--gold);color:var(--gold)}
+.action-btn.danger:hover{border-color:#E07060;color:#E07060}
+
+/* ── REVIEWS ── */
+.review-card{border:0.5px solid var(--border);padding:1.25rem;margin-bottom:0.75rem;display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:start}
+.review-stars{display:flex;gap:2px}
+.star-filled{width:10px;height:10px;background:var(--gold);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.star-empty{width:10px;height:10px;background:var(--border2);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.review-name{font-size:0.78rem;color:var(--cream);margin-bottom:0.2rem}
+.review-meta{font-size:0.62rem;color:var(--stone);margin-bottom:0.5rem}
+.review-text{font-size:0.75rem;color:var(--stone-light);line-height:1.6;font-style:italic}
+.review-tags{display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem}
+.review-tag{font-size:0.58rem;padding:0.2rem 0.5rem;border:0.5px solid var(--border2);color:var(--stone-light)}
+.fictif-badge{font-size:0.55rem;padding:0.15rem 0.4rem;background:rgba(200,149,90,0.1);color:var(--gold);letter-spacing:0.1em;margin-left:0.4rem}
+.toggle-btn{display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0.6rem;border:0.5px solid var(--border2);background:transparent;color:var(--stone-light);font-family:'DM Sans',sans-serif;font-size:0.6rem;cursor:pointer;transition:all 0.2s}
+.toggle-btn:hover{border-color:var(--jade-light);color:var(--jade-light)}
+
+/* ── SATISFACTION GAUGE ── */
+.gauge-wrap{display:flex;align-items:center;gap:2rem;padding:1.5rem;background:var(--bg3);border:0.5px solid var(--border);margin-bottom:1.5rem}
+.gauge-circle{width:80px;height:80px;position:relative;flex-shrink:0}
+.gauge-circle svg{transform:rotate(-90deg)}
+.gauge-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--gold)}
+.gauge-info{}
+.gauge-title{font-size:0.62rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--stone);margin-bottom:0.4rem}
+.gauge-val{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--cream)}
+.gauge-sub{font-size:0.7rem;color:var(--stone-light);margin-top:0.2rem}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:2rem;right:2rem;padding:1rem 1.5rem;background:var(--jade);color:var(--cream);font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+
+/* ── BLOCKED DATES ── */
+.date-chip{display:inline-flex;align-items:center;gap:0.4rem;padding:0.3rem 0.6rem;background:var(--bg3);border:0.5px solid var(--border2);font-size:0.7rem;color:var(--stone-light);margin:0.25rem}
+.date-chip button{background:none;border:none;color:var(--stone);cursor:pointer;font-size:0.8rem;line-height:1;padding:0}
+.date-chip button:hover{color:#E07060}
+
+/* ── PHOTO GRID — nouvelle version ── */
+.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;min-height:120px}
+.photo-slot {
+  position: relative;
+  background: var(--bg3);
+  border: .5px solid var(--border);
+  aspect-ratio: 4/3;
+  min-height: 100px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.photo-slot:hover { border-color: var(--gold); }
+.photo-slot.has-img { border-color: var(--border2); }
+.photo-slot.dragging { opacity: .4; border: .5px dashed var(--gold); }
+.photo-slot.drag-over { border: .5px dashed var(--jade-light) !important; }
+.photo-slot img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.photo-slot-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(transparent, rgba(12,10,7,.85));
+  padding: .4rem .5rem .3rem;
+  font-size: .5rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--stone-light); line-height: 1.2;
+}
+.photo-slot-actions {
+  position: absolute; top: .3rem; right: .3rem;
+  display: flex; gap: .25rem; opacity: 0; transition: opacity .2s;
+}
+.photo-slot:hover .photo-slot-actions { opacity: 1; }
+.photo-slot-empty { pointer-events: none; }
+.photo-slot:not(.has-img) .photo-slot-actions { opacity: 1; }
+.photo-slot-btn {
+  width: 24px; height: 24px;
+  background: rgba(12,10,7,.85); border: .5px solid var(--border2);
+  color: var(--stone-light); cursor: pointer; font-size: .6rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.photo-slot-btn:hover { background: var(--bg); color: var(--cream); }
+.photo-slot-btn.del:hover { background: rgba(192,57,43,.8); color: #fff; border-color: #E07060; }
+.photo-slot-empty {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: .4rem; height: 100%;
+  color: var(--stone); font-size: .58rem;
+  letter-spacing: .12em; text-transform: uppercase;
+}
+.photo-slot-empty svg { opacity: .4; }
+.photo-drag-hint {
+  font-size: .5rem; color: var(--stone); text-align: center;
+  padding: .3rem; opacity: .6;
+}
+/* Section photo grid (fonds de pages) */
+.section-photo-slot {
+  background: var(--bg3); border: .5px solid var(--border);
+  padding: .75rem; display: flex; flex-direction: column; gap: .5rem;
+}
+.section-photo-preview {
+  width: 100%; height: 90px; background: var(--bg4);
+  border: .5px solid var(--border); overflow: hidden;
+  position: relative;
+}
+.section-photo-preview img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.section-photo-preview .sp-empty {
+  display: flex; align-items: center; justify-content: center;
+  height: 100%; color: var(--stone); font-size: .5rem;
+  letter-spacing: .14em; text-transform: uppercase;
+}
+/* ── REVIEW CARDS — modération ── */
+.review-pending {
+  padding: .85rem 1rem; border: .5px solid var(--border);
+  background: var(--bg3); margin-bottom: .5rem;
+  display: flex; gap: .75rem; align-items: flex-start;
+}
+.review-pending.selected { border-color: var(--jade-light); background: rgba(74,124,106,.06); }
+.review-pending-cb {
+  width: 16px; height: 16px; flex-shrink: 0; margin-top: .15rem;
+  accent-color: var(--jade-light); cursor: pointer;
+}
+.review-pending-body { flex: 1; min-width: 0; }
+.review-pending-meta {
+  font-size: .58rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--stone); margin-bottom: .3rem;
+}
+.review-pending-text {
+  font-size: .72rem; color: var(--stone-light); line-height: 1.6;
+  font-style: italic;
+}
+.review-pending-stars { display: flex; gap: 2px; margin-bottom: .25rem; }
+.review-pending-star { width: 8px; height: 8px; background: var(--gold); clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+.review-pending-star.empty { background: var(--bg4); }
+.rv-published {
+  padding: .75rem; border: .5px solid var(--border);
+  margin-bottom: .5rem; background: var(--bg3);
+  display: flex; gap: .5rem; align-items: flex-start;
+}
+.rv-published-body { flex: 1; min-width: 0; }
+.rv-unpublish-btn {
+  flex-shrink: 0; background: none; border: .5px solid var(--border2);
+  color: var(--stone); font-size: .5rem; letter-spacing: .1em;
+  text-transform: uppercase; padding: .2rem .4rem; cursor: pointer;
+  transition: all .15s;
+}
+.rv-unpublish-btn:hover { border-color: #E07060; color: #E07060; }
+/* ── SYNC BADGE ── */
+.sync-badge {
+  display: inline-flex; align-items: center; gap: .3rem;
+  font-size: .52rem; letter-spacing: .14em; text-transform: uppercase;
+  padding: .2rem .6rem; border: .5px solid;
+}
+.sync-badge.synced { color: var(--jade-light); border-color: var(--jade-light); background: rgba(74,124,106,.08); }
+.sync-badge.saving { color: var(--gold); border-color: var(--gold); background: rgba(200,149,90,.08); }
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Le Petit Virevent</div>
+    <div class="login-sub">Interface d'administration</div>
+    <label class="login-label">Mot de passe</label>
+    <input class="login-input" type="password" id="pwd-input" placeholder="••••••••••" onkeydown="if(event.key==='Enter')checkPwd()">
+    <button class="login-btn" onclick="checkPwd()">Accéder au dashboard →</button>
+    <div class="login-err" id="pwd-err"></div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-name">Le Petit Virevent</div>
+      <div class="sb-logo-tag">Administration</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Tableau de bord</div>
+      <div class="sb-link active" onclick="showPage('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Vue d'ensemble
+      </div>
+      <div class="sb-section">Site</div>
+      <div class="sb-link" onclick="showPage('textes')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Textes & traductions
+      </div>
+      <div class="sb-link" onclick="showPage('design')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 105 19.07 10 10 0 0019.07 4.93z"/></svg>
+        Couleurs & polices
+      </div>
+      <div class="sb-link" onclick="showPage('photos')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Photos
+      </div>
+      <div class="sb-link" onclick="showPage('tarifs')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Tarifs & caution
+      </div>
+      <div class="sb-section">Réservations</div>
+      <div class="sb-link" onclick="showPage('calendar')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Calendrier & blocages
+      </div>
+      <div class="sb-link" onclick="showPage('bookings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Liste des réservations
+      </div>
+      <div class="sb-section">Clients</div>
+      <div class="sb-link" onclick="showPage('contacts')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Messages reçus
+      </div>
+      <div class="sb-link" onclick="showPage('reviews')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Avis & satisfaction
+      </div>
+      <div class="sb-section">Paramètres</div>
+      <div class="sb-link" onclick="showPage('partners')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Partenaires
+      </div>
+      <div class="sb-link" onclick="showPage('cgv')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        Conditions Générales de Vente
+      </div>
+      <div class="sb-link" onclick="showPage('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06
+              a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4
+              a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15
+              a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82
+              l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3
+              a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83
+              l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+          </svg>
+        Paramètres généraux
+      </div>
+    </nav>
+    <div class="sb-footer">
+      <div style="font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(138,123,106,.5);margin-bottom:.4rem" id="session-indicator">Session active</div>
+      <div class="sb-logout" onclick="logout()">← Déconnexion</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="topbar">
+        <div><div class="page-title">Vue d'ensemble</div><div class="page-sub">Bienvenue dans votre espace de gestion</div></div>
+      </div>
+      <div class="stat-grid" id="stats-grid"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+        <div class="card">
+          <div class="card-title">Prochaines réservations</div>
+          <div id="dash-bookings"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Derniers messages</div>
+          <div id="dash-contacts"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TEXTES ── -->
+    <div class="page" id="page-textes">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Textes du site</div>
+          <div class="page-sub">Modifiez les textes en français et en anglais — cliquez Publier pour mettre le site à jour immédiatement</div>
+        </div>
+        <button class="save-btn" onclick="saveTexts()">💾 Publier sur le site</button>
+      </div>
+      <div id="texts-sections-container"></div>
+    </div>
+
+    <!-- ── DESIGN ── -->
+    <div class="page" id="page-design">
+      <div class="topbar">
+        <div><div class="page-title">Couleurs & Polices</div><div class="page-sub">Personnalisez l'identité visuelle du site</div></div>
+        <button class="save-btn" onclick="saveDesign()">Enregistrer</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Palette de couleurs</div>
+        <div class="color-grid" id="color-grid"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Typographie</div>
+        <div class="form-row">
+          <div class="field-group">
+            <label class="field-label">Police serif (titres)</label>
+            <select class="field-input" id="font-serif">
+              <option>Playfair Display</option><option>Cormorant Garamond</option>
+              <option>Libre Baskerville</option><option>EB Garamond</option><option>Lora</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Police sans-serif (corps)</label>
+            <select class="field-input" id="font-sans">
+              <option>DM Sans</option><option>Jost</option><option>Inter</option>
+              <option>Outfit</option><option>Nunito Sans</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Informations du site</div>
+        <div class="form-row">
+          <div class="field-group"><label class="field-label">Nom de la villa</label><input class="field-input" id="cfg-siteName"></div>
+          <div class="field-group"><label class="field-label">Tagline</label><input class="field-input" id="cfg-tagline"></div>
+        </div>
+        <div class="form-row">
+          <div class="field-group"><label class="field-label">Localisation affichée</label><input class="field-input" id="cfg-location"></div>
+          <div class="field-group"><label class="field-label">Email de contact</label><input class="field-input" id="cfg-email"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PHOTOS ── -->
+    <div class="page" id="page-photos">
+      <div class="topbar">
+        <div><div class="page-title">Photos & Médias</div><div class="page-sub">Gérez toutes les images du site — galerie, fonds de pages, logo</div></div>
+        <button class="save-btn" onclick="savePhotos()">💾 Enregistrer tout</button>
+      </div>
+
+      <!-- Galerie -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+          <div class="card-title" style="margin-bottom:0">🖼 Galerie de photos</div>
+          <button class="action-btn" onclick="addGallerySlot()" id="btn-add-gallery">+ Ajouter une photo</button>
+        </div>
+        <div style="font-size:.62rem;color:var(--stone-light);margin-bottom:1rem;line-height:1.5">
+          Les photos apparaissent dans la grille galerie du site. Faites glisser pour réordonner. Minimum 1, maximum 20 photos.
+        </div>
+        <div class="photo-grid" id="photo-grid-gallery"></div>
+      </div>
+
+      <!-- Fonds de pages -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card-title">🌅 Fonds de pages & images de sections</div>
+        <div style="font-size:.62rem;color:var(--stone-light);margin-bottom:1.25rem;line-height:1.5">
+          Ces images s'affichent en arrière-plan des sections du site. Laissez vide pour utiliser la couleur de fond par défaut.
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem" id="photo-grid-sections"></div>
+      </div>
+
+      <!-- Identité -->
+      <div class="card">
+        <div class="card-title">🏷 Logo & identité visuelle</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem" id="photo-grid-identity"></div>
+      </div>
+    </div>
+
+    <!-- ── TARIFS ── -->
+    <div class="page" id="page-tarifs">
+      <div class="topbar">
+        <div><div class="page-title">Tarifs & Saisons</div><div class="page-sub">Configurez les prix TTC, les périodes de saison, la taxe de séjour et les codes promo</div></div>
+        <button class="save-btn" onclick="saveTarifs()">Enregistrer tout</button>
+      </div>
+
+      <!-- Tarifs par saison -->
+      <div class="card">
+        <div class="card-title">💶 Tarifs par nuit TTC (TVA 10% incluse)</div>
+        <div style="font-size:.65rem;color:var(--stone-light);margin-bottom:1rem;line-height:1.6">Les prix affichés sont <strong style="color:var(--cream)">TTC</strong>. La TVA 10% est calculée automatiquement sur la facture (loyer ÷ 1,10 = base HT).</div>
+        <div class="form-row3">
+          <div class="field-group">
+            <label class="field-label">🌞 Haute saison — Tarif/nuit TTC (€)</label>
+            <input class="field-input" type="number" id="tarif-haute-pn" placeholder="543">
+            <div style="font-size:.58rem;color:var(--stone);margin-top:.25rem" id="hint-haute"></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">🌸 Mi-saison — Tarif/nuit TTC (€)</label>
+            <input class="field-input" type="number" id="tarif-mi-pn" placeholder="386">
+            <div style="font-size:.58rem;color:var(--stone);margin-top:.25rem" id="hint-mi"></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">🍂 Basse saison — Tarif/nuit TTC (€)</label>
+            <input class="field-input" type="number" id="tarif-basse-pn" placeholder="271">
+            <div style="font-size:.58rem;color:var(--stone);margin-top:.25rem" id="hint-basse"></div>
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:.75rem">
+          <div class="field-group">
+            <label class="field-label">🎄 Noël & Nouvel An — Tarif/nuit TTC (€)</label>
+            <input class="field-input" type="number" id="tarif-xmas-pn" placeholder="486">
+            <div style="font-size:.58rem;color:var(--stone);margin-top:.25rem" id="hint-xmas"></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">🐣 Vacances de Pâques — Tarif/nuit TTC (€)</label>
+            <input class="field-input" type="number" id="tarif-easter-pn" placeholder="386">
+            <div style="font-size:.58rem;color:var(--stone);margin-top:.25rem" id="hint-easter"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Périodes de saison -->
+      <div class="card">
+        <div class="card-title">📅 Périodes de saison (dates)</div>
+        <div style="font-size:.65rem;color:var(--stone-light);margin-bottom:1.25rem;line-height:1.6">
+          Définissez les périodes pour chaque saison. Plusieurs tranches possibles par saison — cliquez <strong style="color:var(--cream)">+ Ajouter une tranche</strong>. Les années sont ignorées : seuls le mois et le jour comptent.
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem">
+          <div>
+            <div style="font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem">🌞 Haute saison</div>
+            <div id="ranges-haute"></div>
+            <button class="action-btn" style="margin-top:.5rem;font-size:.55rem" onclick="addSeasonRange('haute')">+ Ajouter une tranche</button>
+          </div>
+          <div>
+            <div style="font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--jade-light);margin-bottom:.75rem">🌸 Mi-saison</div>
+            <div id="ranges-mi"></div>
+            <button class="action-btn" style="margin-top:.5rem;font-size:.55rem" onclick="addSeasonRange('mi')">+ Ajouter une tranche</button>
+          </div>
+          <div>
+            <div style="font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--stone-light);margin-bottom:.75rem">🍂 Basse saison</div>
+            <div id="ranges-basse"></div>
+            <button class="action-btn" style="margin-top:.5rem;font-size:.55rem" onclick="addSeasonRange('basse')">+ Ajouter une tranche</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1.25rem;padding-top:1.25rem;border-top:.5px solid var(--border)">
+          <div>
+            <div style="font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--jade-light);margin-bottom:.75rem">🎄 Noël & Nouvel An</div>
+            <div id="ranges-xmas"></div>
+            <button class="action-btn" style="margin-top:.5rem;font-size:.55rem" onclick="addSeasonRange('xmas')">+ Ajouter une tranche</button>
+          </div>
+          <div>
+            <div style="font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--jade-light);margin-bottom:.75rem">🐣 Vacances de Pâques</div>
+            <div id="ranges-easter"></div>
+            <button class="action-btn" style="margin-top:.5rem;font-size:.55rem" onclick="addSeasonRange('easter')">+ Ajouter une tranche</button>
+          </div>
+        </div>
+        <div style="font-size:.6rem;color:var(--stone);margin-top:1rem;padding:.6rem .75rem;background:var(--bg3);border-left:2px solid var(--border2)">
+          💡 La Basse saison est calculée automatiquement (tout jour non couvert par les autres saisons). Vous pouvez aussi définir des tranches manuelles pour afficher les dates sur le site.
+        </div>
+      </div>
+
+      <!-- Caution & Taxe de séjour -->
+      <div class="card">
+        <div class="card-title">💰 Caution & Taxe de séjour</div>
+        <div class="form-row">
+          <div class="field-group">
+            <label class="field-label">Montant de la caution (€)</label>
+            <input class="field-input" type="number" id="tarif-caution" placeholder="1500">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Taxe de séjour (€ / personne / nuit)</label>
+            <input class="field-input" type="number" step="0.1" id="tarif-taxe" placeholder="1.50">
+            <div style="font-size:.58rem;color:var(--stone);margin-top:.25rem">Légalement exonérée de TVA — calculée sur le nb de personnes × nb de nuits</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Nuits minimum basse saison</label>
+            <input class="field-input" type="number" id="tarif-minNuits" placeholder="7">
+          </div>
+        </div>
+      </div>
+
+      <!-- Services optionnels - tarifs -->
+      <div class="card">
+        <div class="card-title">🧹 Services optionnels — Tarifs unitaires</div>
+        <div style="font-size:.65rem;color:var(--stone-light);margin-bottom:1.25rem;line-height:1.6">
+          Ces tarifs s'affichent sur le site et s'ajoutent au total de la réservation.
+          Le ménage et la piscine sont facturés <strong style="color:var(--cream)">par passage</strong>, le lit bébé <strong style="color:var(--cream)">par nuit</strong>.
+        </div>
+        <div class="form-row3">
+          <div class="field-group">
+            <label class="field-label">🧹 Ménage intermédiaire — Prix/passage (€)</label>
+            <input class="field-input" type="number" id="svc-menage-pn" placeholder="120" min="0">
+            <div style="font-size:.58rem;color:var(--stone);margin-top:.25rem">Options : ×1, ×2, ×3 passages affichées au client</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">🏊 Nettoyage piscine — Prix/passage (€)</label>
+            <input class="field-input" type="number" id="svc-piscine-pn" placeholder="80" min="0">
+            <div style="font-size:.58rem;color:var(--stone);margin-top:.25rem">Options : ×1, ×2, ×3 passages affichées au client</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">🍼 Lit bébé parapluie — Prix/nuit (€)</label>
+            <input class="field-input" type="number" id="svc-bebe-pn" placeholder="5" min="0" step="0.5">
+            <div style="font-size:.58rem;color:var(--stone);margin-top:.25rem">Multiplié par le nombre de nuits du séjour</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Codes promo -->
+      <div class="card">
+        <div class="card-title">🎁 Codes promotionnels</div>
+        <div style="font-size:.65rem;color:var(--stone-light);margin-bottom:1rem">Ces codes peuvent être utilisés par les clients dans le formulaire de réservation. Max 10 codes.</div>
+        <div id="promo-codes-list" style="margin-bottom:1rem"></div>
+        <button class="action-btn" onclick="addPromoCode()" id="btn-add-promo">+ Ajouter un code promo</button>
+      </div>
+
+      <!-- Pop-up promo -->
+      <div class="card">
+        <div class="card-title">🎯 Pop-up promotionnel (à l'ouverture du site)</div>
+        <div style="font-size:.65rem;color:var(--stone-light);margin-bottom:1rem">Affiché une seule fois par session navigateur. Configurez le message, une image et un code promo optionnel.</div>
+        <div class="form-row">
+          <div class="field-group" style="grid-column:1/-1;display:flex;align-items:center;gap:1rem">
+            <label style="font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--stone)">Activer le pop-up</label>
+            <select class="field-input" id="popup-active" style="max-width:120px">
+              <option value="false">Désactivé</option>
+              <option value="true">Activé</option>
+            </select>
+            <input class="field-input" type="number" id="popup-delay" placeholder="3" style="max-width:80px" title="Délai avant affichage (secondes)">
+            <span style="font-size:.6rem;color:var(--stone)">secondes de délai</span>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Tag (ex : Offre spéciale)</label>
+            <input class="field-input" id="popup-tag" placeholder="Offre spéciale">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Titre</label>
+            <input class="field-input" id="popup-title" placeholder="−15% ce week-end !">
+          </div>
+          <div class="field-group" style="grid-column:1/-1">
+            <label class="field-label">Texte / Description</label>
+            <textarea class="field-input" id="popup-text" rows="2" placeholder="Profitez de notre offre exclusive…" style="resize:vertical"></textarea>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Code promo affiché (optionnel)</label>
+            <input class="field-input" id="popup-code" placeholder="ETE2026">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Label bouton</label>
+            <input class="field-input" id="popup-btn" placeholder="Réserver maintenant">
+          </div>
+          <div class="field-group" style="grid-column:1/-1">
+            <label class="field-label">Image du pop-up (optionnel)</label>
+            <div style="display:flex;gap:.5rem;align-items:center">
+              <label class="photo-upload" style="flex-shrink:0">📷 Uploader<input type="file" accept="image/*" style="display:none" onchange="uploadPopupImage(this)"></label>
+              <input class="field-input" id="popup-image" placeholder="URL ou base64…" style="flex:1;font-size:.68rem">
+            </div>
+            <div id="popup-img-preview" style="margin-top:.5rem;display:none"><img src="" style="max-height:120px;object-fit:cover;border:.5px solid var(--border)"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── CALENDAR ── -->
+    <div class="page" id="page-calendar">
+      <div class="topbar">
+        <div><div class="page-title">Calendrier & Blocages</div><div class="page-sub">Bloquez manuellement des dates ou périodes</div></div>
+        <button class="save-btn" onclick="saveCalendar()">Enregistrer</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Ajouter une période bloquée</div>
+        <div class="form-row" style="margin-bottom:1rem">
+          <div class="field-group"><label class="field-label">Date d'arrivée</label><input class="field-input" type="date" id="block-start"></div>
+          <div class="field-group"><label class="field-label">Date de départ</label><input class="field-input" type="date" id="block-end"></div>
+        </div>
+        <div class="field-group" style="max-width:400px;margin-bottom:1rem"><label class="field-label">Motif (optionnel)</label><input class="field-input" id="block-reason" placeholder="Maintenance, usage personnel…"></div>
+        <button class="save-btn" onclick="addBlockedDate()" style="background:var(--bg3);color:var(--gold);border:0.5px solid var(--border2)">Ajouter le blocage</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Périodes bloquées</div>
+        <div id="blocked-list"></div>
+      </div>
+    </div>
+
+    <!-- ── BOOKINGS ── -->
+    <div class="page" id="page-bookings">
+      <div class="topbar">
+        <div><div class="page-title">Réservations</div><div class="page-sub">Toutes les réservations enregistrées</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Liste des réservations</div>
+        <table class="data-table"><thead><tr>
+          <th>Ref. / Date</th><th>Client</th><th>Arrivée</th><th>Départ</th><th>Nuits</th><th>Loyer / Services</th><th>CGV</th><th>Statut</th><th>Actions</th>
+        </tr></thead><tbody id="bookings-tbody"></tbody></table>
+      </div>
+      <div class="card" style="margin-top:1.5rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <div class="card-title" style="margin-bottom:0">🚫 Périodes bloquées</div>
+          <button class="action-btn" onclick="showPage('calendar')" style="font-size:.58rem">Gérer →</button>
+        </div>
+        <table class="data-table"><thead><tr><th>Motif</th><th>Arrivée</th><th>Départ</th><th>Durée</th><th>Actions</th></tr></thead><tbody id="blocked-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ── CONTACTS ── -->
+    <div class="page" id="page-contacts">
+      <div class="topbar">
+        <div><div class="page-title">Messages reçus</div><div class="page-sub">Formulaire de contact du site</div></div>
+      </div>
+      <div class="card">
+        <table class="data-table"><thead><tr>
+          <th>Date</th><th>Nom</th><th>Email</th><th>Sujet</th><th>Message</th><th>Statut</th>
+        </tr></thead><tbody id="contacts-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ── REVIEWS ── -->
+    <div class="page" id="page-reviews">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Avis & Satisfaction</div>
+          <div class="page-sub">Recevez, modérez et publiez les avis clients sur le site</div>
+        </div>
+        <button class="save-btn" onclick="publishReviews()">💾 Publier la sélection</button>
+      </div>
+
+      <!-- Jauge satisfaction -->
+      <div id="gauge-container" style="margin-bottom:1.5rem"></div>
+
+      <!-- Avis en attente de modération -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <div class="card-title" style="margin-bottom:0">📬 Avis en attente de modération</div>
+          <span id="pending-count" style="font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);background:var(--gold-dim);padding:.2rem .6rem;border:.5px solid var(--gold)"></span>
+        </div>
+        <div style="font-size:.62rem;color:var(--stone-light);margin-bottom:1rem;line-height:1.5">
+          Ces avis ont été soumis via le formulaire de satisfaction. Cochez ceux que vous souhaitez publier sur le site, puis cliquez <strong style="color:var(--cream)">Publier la sélection</strong>.
+        </div>
+        <div id="pending-reviews">
+          <div style="font-size:.72rem;color:var(--stone);padding:.5rem 0">Aucun avis en attente pour le moment.</div>
+        </div>
+      </div>
+
+      <!-- Avis publiés -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+        <div class="card">
+          <div class="card-title">✅ Avis publiés sur le site</div>
+          <div style="font-size:.62rem;color:var(--stone-light);margin-bottom:1rem;line-height:1.5">
+            Ces avis sont actuellement visibles sur le site. Vous pouvez les retirer à tout moment.
+          </div>
+          <div id="real-reviews"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🎭 Avis fictifs d'amorçage</div>
+          <div style="font-size:0.72rem;color:var(--stone-light);line-height:1.6;margin-bottom:1rem;padding:0.75rem;background:var(--gold-dim);border-left:2px solid var(--gold)">
+            Ces avis sont affichés tant que le nombre de vrais avis publiés est inférieur au seuil. Activez/désactivez individuellement.
+          </div>
+          <div class="field-group" style="display:flex;gap:1rem;align-items:flex-end;margin-bottom:1.25rem">
+            <div style="flex:1">
+              <label class="field-label">Seuil de désactivation auto (nb de vrais avis)</label>
+              <input class="field-input" type="number" id="review-threshold" style="max-width:120px">
+            </div>
+            <button class="save-btn" onclick="saveThreshold()">Appliquer</button>
+          </div>
+          <div id="fictitious-reviews"></div>
+        </div>
+      </div>
+
+      <!-- Ajouter manuellement un avis -->
+      <div class="card" style="margin-top:1.5rem">
+        <div class="card-title">✏️ Ajouter un avis manuellement</div>
+        <div style="font-size:.62rem;color:var(--stone-light);margin-bottom:1rem">Pour les avis reçus par email ou autre canal.</div>
+        <div class="form-row">
+          <div class="field-group">
+            <label class="field-label">Nom du client</label>
+            <input class="field-input" id="new-review-name" placeholder="Sophie & Édouard L.">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Origine</label>
+            <input class="field-input" id="new-review-origin" placeholder="Paris">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field-group">
+            <label class="field-label">Note (1–5)</label>
+            <select class="field-input" id="new-review-note">
+              <option value="5">⭐⭐⭐⭐⭐ — 5/5</option>
+              <option value="4">⭐⭐⭐⭐ — 4/5</option>
+              <option value="3">⭐⭐⭐ — 3/5</option>
+              <option value="2">⭐⭐ — 2/5</option>
+              <option value="1">⭐ — 1/5</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Date du séjour</label>
+            <input class="field-input" id="new-review-date" placeholder="Juillet 2025">
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Commentaire</label>
+          <textarea class="field-input" id="new-review-comment" rows="3" style="resize:vertical" placeholder="L'avis du client…"></textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Tags (séparés par des virgules)</label>
+          <input class="field-input" id="new-review-tags" placeholder="Piscine, Terrasse, Architecture">
+        </div>
+        <button class="save-btn" onclick="addManualReview()" style="margin-top:.5rem">Ajouter et publier cet avis</button>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div class="page" id="page-settings">
+      <div class="topbar">
+        <div><div class="page-title">Paramètres généraux</div><div class="page-sub">Informations société, sécurité et configuration avancée</div></div>
+        <button class="save-btn" onclick="saveSettings()">Enregistrer</button>
+      </div>
+
+      <!-- SOCIÉTÉ -->
+      <div class="card" style="margin-bottom:1rem">
+        <div class="card-title">🏢 Informations de la société</div>
+        <div style="font-size:.68rem;color:var(--stone-light);line-height:1.7;margin-bottom:.85rem">
+          Utilisées automatiquement dans les CGV, reçus, factures et proforma.
+        </div>
+        <div class="form-row">
+          <div class="field-group"><label class="field-label">Nom de la société *</label><input class="field-input" id="cfg-company-name" placeholder="FCM INVESTISSEMENT"></div>
+          <div class="field-group"><label class="field-label">N° SIRET *</label><input class="field-input" id="cfg-company-siret" placeholder="929 774 453 00013"></div>
+        </div>
+        <div class="form-row">
+          <div class="field-group" style="grid-column:1/-1"><label class="field-label">Adresse complète *</label><input class="field-input" id="cfg-company-address" placeholder="49 Lotissement Clos des Cadenières, 84490 Cheval-Blanc"></div>
+        </div>
+        <div class="form-row">
+          <div class="field-group"><label class="field-label">Email de contact *</label><input class="field-input" id="cfg-company-email" placeholder="contact@lepetit-virevent.fr"></div>
+          <div class="field-group"><label class="field-label">Téléphone</label><input class="field-input" id="cfg-company-phone" placeholder="+33 6 00 00 00 00"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🏦 Coordonnées bancaires (virement)</div>
+        <div style="font-size:.68rem;color:var(--stone-light);line-height:1.7;margin-bottom:.85rem">
+          Ces informations apparaissent sur la facture proforma que le locataire télécharge pour effectuer son virement du loyer (30 jours avant l'arrivée).
+        </div>
+        <div class="form-row">
+          <div class="field-group"><label class="field-label">Titulaire du compte</label><input class="field-input" id="cfg-bankName" placeholder="FCM INVESTISSEMENT"></div>
+          <div class="field-group"><label class="field-label">Banque</label><input class="field-input" id="cfg-bankBank" placeholder="Crédit Agricole, BNP Paribas…"></div>
+        </div>
+        <div class="form-row">
+          <div class="field-group" style="grid-column:1/-1"><label class="field-label">IBAN</label><input class="field-input" id="cfg-bankIban" placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX" style="font-family:monospace;letter-spacing:.08em"></div>
+        </div>
+        <div class="form-row">
+          <div class="field-group"><label class="field-label">BIC / SWIFT</label><input class="field-input" id="cfg-bankBic" placeholder="AGRIFRPP…"></div>
+          <div class="field-group"><label class="field-label">Référence à indiquer (optionnel)</label><input class="field-input" id="cfg-bankRef" placeholder="REF VIR + N° réservation"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">💳 Lien de paiement sécurisé</div>
+        <div style="font-size:.68rem;color:var(--stone-light);line-height:1.7;margin-bottom:.85rem">
+          Lien Stripe ou autre prestataire — ouvert quand le client clique "Payer la caution".
+        </div>
+        <div class="form-row">
+          <div class="field-group" style="grid-column:1/-1">
+            <label class="field-label">Prestataire</label>
+            <select class="field-input" id="cfg-payProvider" style="margin-bottom:.6rem" onchange="updatePayProviderHint()">
+              <option value="stripe">Stripe</option>
+              <option value="sumup">SumUp</option>
+              <option value="paypal">PayPal</option>
+              <option value="autre">Autre</option>
+            </select>
+          </div>
+          <div class="field-group" style="grid-column:1/-1">
+            <label class="field-label">Lien de paiement <span id="pay-provider-hint" style="color:var(--gold)">(Stripe Payment Link)</span></label>
+            <input class="field-input" id="cfg-payUrl" placeholder="https://buy.stripe.com/xxxx…" style="font-family:monospace;font-size:.72rem">
+          </div>
+          <div class="field-group" style="grid-column:1/-1">
+            <label class="field-label">Libellé du bouton</label>
+            <input class="field-input" id="cfg-payLabel" placeholder="Payer la caution (1 500 €)">
+          </div>
+        </div>
+        <div id="pay-test-zone" style="display:none;margin-top:.5rem;padding:.75rem;background:var(--bg3);border:.5px solid var(--border);font-size:.68rem;color:var(--stone-light)">
+          Lien : <a id="pay-test-link" href="#" target="_blank" style="color:var(--gold);word-break:break-all"></a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Sécurité</div>
+        <div class="form-row">
+          <div class="field-group"><label class="field-label">Email admin (pour OTP)</label><input class="field-input" id="cfg-adminEmail"></div>
+          <div class="field-group"><label class="field-label">Nouveau mot de passe</label><input class="field-input" type="password" id="cfg-adminPwd" placeholder="Laisser vide pour ne pas changer"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Formulaire de satisfaction</div>
+        <div class="form-row">
+          <div class="field-group"><label class="field-label">Délai d'envoi après départ</label>
+            <select class="field-input" id="cfg-reviewDelay">
+              <option value="1">J+1</option><option value="3" selected>J+3</option><option value="7">J+7</option>
+            </select>
+          </div>
+          <div class="field-group"><label class="field-label">Afficher satisfaction en page principale</label>
+            <select class="field-input" id="cfg-satisfVisible">
+              <option value="true">Oui</option><option value="false">Non</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Données</div>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap">
+          <button class="action-btn" onclick="exportData()">Exporter toutes les données (JSON)</button>
+          <button class="action-btn danger" onclick="if(confirm('Réinitialiser toutes les données ?'))resetData()">Réinitialiser les données</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">💡 Comment fonctionne la synchronisation admin → site</div>
+        <div style="font-size:.72rem;color:var(--stone-light);line-height:1.85">
+          <p style="margin-bottom:.75rem">
+            Ce site utilise le <strong style="color:var(--cream)">stockage local du navigateur</strong>
+            (localStorage). Cela signifie que vos modifications sont enregistrées
+            <strong style="color:var(--cream)">uniquement sur cet appareil et ce navigateur</strong>.
+            Si un visiteur ouvre le site sur son téléphone ou un autre ordinateur,
+            il ne verra pas vos photos et configurations personnalisées.
+          </p>
+          <p style="margin-bottom:.75rem"><strong style="color:var(--gold)">Pour que vos modifications soient visibles par tout le monde sur internet</strong>, il faut déployer le site sur un hébergement web :</p>
+          <div style="background:var(--bg3);border:.5px solid var(--border);padding:.85rem 1rem;margin-bottom:.75rem;display:flex;flex-direction:column;gap:.5rem">
+            <div style="font-size:.68rem;color:var(--cream)">✅ Solution simple et gratuite : <strong>GitHub Pages + Netlify</strong></div>
+            <div style="font-size:.65rem;color:var(--stone-light)">1. Créez un compte sur <a href="https://github.com" target="_blank" style="color:var(--gold)">github.com</a> et uploadez index.html + admin.html<br>
+            2. Connectez à <a href="https://netlify.com" target="_blank" style="color:var(--gold)">netlify.com</a> → votre site sera en ligne en 2 minutes<br>
+            3. Pour les photos et données : utilisez <a href="https://airtable.com" target="_blank" style="color:var(--gold)">Airtable</a> (gratuit) comme base de données — je peux vous aider à l'intégrer</div>
+          </div>
+          <div style="background:var(--bg3);border:.5px solid var(--border);padding:.85rem 1rem;display:flex;flex-direction:column;gap:.5rem">
+            <div style="font-size:.68rem;color:var(--cream)">🚀 Solution professionnelle : <strong>Supabase + déploiement automatique</strong></div>
+            <div style="font-size:.65rem;color:var(--stone-light)">Chaque modification admin se synchronise en temps réel sur tous les appareils. Nécessite quelques heures de développement supplémentaire — à prévoir pour la mise en ligne définitive.</div>
+          </div>
+          <p style="margin-top:.75rem;font-size:.62rem;color:var(--stone)">En attendant le déploiement, utilisez ce dashboard pour préparer tout le contenu, puis exportez les données (bouton ci-dessus) pour les transférer vers le serveur final.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CGV ── -->
+    <div class="page" id="page-partners">
+      <div class="topbar">
+        <div><div class="page-title">Partenaires</div><div class="page-sub">Gérez les partenaires affichés dans le footer du site</div></div>
+        <div style="display:flex;gap:.5rem">
+          <button class="action-btn" onclick="addPartner()" id="btn-add-partner">+ Ajouter un partenaire</button>
+          <button class="save-btn" onclick="savePartners_admin()">Enregistrer</button>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:.62rem;color:var(--stone-light);margin-bottom:1rem;line-height:1.5">
+          Max 10 partenaires. Chaque partenaire a un nom, une URL et optionnellement un logo et une description courte.
+        </div>
+        <div id="partners-list" style="margin-bottom:1rem"></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-cgv">
+      <div class="topbar">
+        <div><div class="page-title">Conditions Générales de Vente</div><div class="page-sub">Éditez et publiez vos CGV — affichées dans le footer du site et lors de la réservation</div></div>
+        <div style="display:flex;gap:.5rem">
+          <button class="action-btn" onclick="previewCGV()" style="background:none">Aperçu</button>
+          <button class="save-btn" onclick="saveCGV()">Publier</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1rem">
+        <div class="card-title" style="margin-bottom:.75rem">Informations légales (auto-remplies dans le texte)</div>
+        <div class="form-row">
+          <div class="field-group"><label class="field-label">Société</label><input class="field-input" id="cgv-societe" value="FCM INVESTISSEMENT"></div>
+          <div class="field-group"><label class="field-label">Siret</label><input class="field-input" id="cgv-siret" value="929 774 453 00013"></div>
+          <div class="field-group"><label class="field-label">Adresse</label><input class="field-input" id="cgv-adresse" value="49 Lotissement Clos des Cadenières, 84490 Cheval-Blanc"></div>
+          <div class="field-group"><label class="field-label">Email contact</label><input class="field-input" id="cgv-email" value="contact@lepetit-virevent.fr"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+          <div class="card-title" style="margin-bottom:0">Texte des CGV</div>
+          <div style="display:flex;gap:.5rem;align-items:center">
+            <button class="action-btn" onclick="loadDefaultCGV()" style="font-size:.58rem">Réinitialiser</button>
+          </div>
+        </div>
+
+        <!-- Import fichier texte -->
+        <div style="background:var(--bg3);border:.5px solid var(--bdr2);padding:.85rem 1rem;margin-bottom:.85rem;display:flex;flex-wrap:wrap;gap:.75rem;align-items:center">
+          <div style="flex:1;min-width:200px">
+            <div style="font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.3rem">📄 Importer un fichier Word (.docx)</div>
+            <div style="font-size:.6rem;color:var(--stone-light);line-height:1.5">Sélectionnez un fichier Word (.docx) — la mise en forme (titres, paragraphes, listes, gras) sera convertie automatiquement en HTML adapté au site.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:.4rem;align-items:flex-end">
+            <label style="cursor:pointer">
+              <input type="file" id="cgv-file-input" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" onchange="importCGVFile(this)">
+              <span class="action-btn" style="font-size:.6rem;padding:.45rem .9rem;display:inline-block;cursor:pointer">📂 Choisir un fichier .docx</span>
+            </label>
+            <div id="cgv-file-name" style="font-size:.58rem;color:var(--stone);font-style:italic">Aucun fichier sélectionné</div>
+          </div>
+        </div>
+
+        <div style="font-size:.62rem;color:var(--stone-light);margin-bottom:.6rem;line-height:1.5">
+          Vous pouvez aussi éditer directement le HTML : &lt;h3&gt;Titre&lt;/h3&gt; · &lt;p&gt;Paragraphe&lt;/p&gt; · &lt;strong&gt;Gras&lt;/strong&gt;
+        </div>
+        <textarea id="cgv-text" style="width:100%;height:420px;background:var(--bg4);border:.5px solid var(--border);color:var(--stone-light);font-family:'DM Sans',monospace;font-size:.72rem;line-height:1.7;padding:.75rem;outline:none;resize:vertical" placeholder="Saisissez, collez du HTML ou importez un fichier Word .docx…"></textarea>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Version en vigueur</div>
+        <div style="font-size:.72rem;color:var(--stone-light);line-height:1.7" id="cgv-meta">Aucune CGV publiée pour le moment.</div>
+      </div>
+    </div>
+
+  </main>
+
+<!-- ── MODAL APERÇU IMPRESSION ── -->
+<div id="print-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:#fff;width:100%;max-width:820px;max-height:92vh;display:flex;flex-direction:column;border-radius:2px;overflow:hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;background:#1a1a1a;flex-shrink:0">
+      <span style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:#C49553" id="print-modal-title">Document</span>
+      <div style="display:flex;gap:.5rem">
+        <button onclick="printModalDoc()" style="background:#C49553;border:none;color:#fff;padding:.4rem 1rem;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer">🖨 Imprimer / PDF</button>
+        <button onclick="closePrintModal()" style="background:none;border:1px solid #555;color:#999;padding:.4rem .75rem;font-size:.72rem;cursor:pointer">✕ Fermer</button>
+      </div>
+    </div>
+    <div id="print-modal-body" style="flex:1;overflow-y:auto;padding:0;background:#f5f5f5">
+      <iframe id="print-iframe" style="width:100%;height:100%;min-height:70vh;border:none;background:#fff"></iframe>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STORE (inline) ──
+const Store = {
+  K:{C:'virevent_config',B:'virevent_bookings',R:'virevent_reviews',CT:'virevent_contacts',OTP:'virevent_otp'},
+  defaults:{
+    config:{
+      siteName:'Le Petit Virevent',tagline:'Bali rencontre la Provence',location:'Bonnieux · Luberon · Vaucluse',
+      email:'contact@lepetit-virevent.fr',phone:'+33 6 00 00 00 00',
+      colorBg:'#0D0B08',colorBg2:'#141210',colorBg3:'#1C1915',
+      colorGold:'#C8955A',colorJade:'#4A7C6A',colorCream:'#F0EAE0',colorStone:'#8C7B6A',
+      fontSerif:'Playfair Display',fontSans:'DM Sans',
+      tarifHaute:3800,tarifMi:2700,tarifBasse:1900,caution:1500,minNuitsBasse:3,
+      reviewThreshold:5,satisfactionVisible:true,reviewDelay:3,
+      photos:[
+        {id:'logo',      label:'🏷 Logo — navbar & footer (remplace le texte)',url:'', section:'identite'},
+        {id:'hero',      label:'🏠 Hero — fond plein écran',          url:'', section:'hero'},
+        {id:'gal1',  label:'🖼 Photo 1 (principale)',  url:'', section:'galerie'},
+        {id:'gal2',  label:'🖼 Photo 2',  url:'', section:'galerie'},
+        {id:'gal3',  label:'🖼 Photo 3',  url:'', section:'galerie'},
+        {id:'gal4',  label:'🖼 Photo 4',  url:'', section:'galerie'},
+        {id:'gal5',  label:'🖼 Photo 5',  url:'', section:'galerie'},
+        {id:'gallery_6',  label:'🖼 Photo 6',   url:'', section:'galerie'},
+        {id:'gallery_7',  label:'🖼 Photo 7',   url:'', section:'galerie'},
+        {id:'gallery_8',  label:'🖼 Photo 8',   url:'', section:'galerie'},
+        {id:'gallery_9',  label:'🖼 Photo 9',   url:'', section:'galerie'},
+        {id:'gallery_10', label:'🖼 Photo 10',  url:'', section:'galerie'},
+        {id:'gallery_11', label:'🖼 Photo 11',  url:'', section:'galerie'},
+        {id:'gallery_12', label:'🖼 Photo 12',  url:'', section:'galerie'},
+        {id:'gallery_13', label:'🖼 Photo 13',  url:'', section:'galerie'},
+        {id:'gallery_14', label:'🖼 Photo 14',  url:'', section:'galerie'},
+        {id:'gallery_15', label:'🖼 Photo 15',  url:'', section:'galerie'},
+        {id:'gallery_16', label:'🖼 Photo 16',  url:'', section:'galerie'},
+        {id:'gallery_17', label:'🖼 Photo 17',  url:'', section:'galerie'},
+        {id:'gallery_18', label:'🖼 Photo 18',  url:'', section:'galerie'},
+        {id:'gallery_19', label:'🖼 Photo 19',  url:'', section:'galerie'},
+        {id:'gallery_20', label:'🖼 Photo 20',  url:'', section:'galerie'},
+        {id:'villa_bg',  label:'🌿 Villa — fond de section',           url:'', section:'villa'},
+        {id:'villa_img', label:'🏡 Villa — photo principale (droite)', url:'', section:'villa'},
+        {id:'tarifs_bg', label:'💶 Tarifs — fond de section',          url:'', section:'tarifs'},
+        {id:'avis_bg',   label:'⭐ Avis — fond de section',            url:'', section:'avis'},
+        {id:'contact_bg',label:'✉️ Contact — fond de section',         url:'', section:'contact'},
+      ],
+      blockedDates:[],
+      adminPassword:'LilyOpaleElena84',adminEmail:'contact@lepetit-virevent.fr',
+    },
+    reviews:{
+      real:[],
+      fictitious:[
+        {id:'f1',name:'Sophie & Édouard L.',origin:'Paris',date:'Juillet 2024',note:5,tags:['Piscine','Terrasse','Architecture'],comment:'Un endroit hors du temps. La lumière du Luberon au coucher du soleil est inoubliable.',active:true},
+        {id:'f2',name:'Hélène & Thomas V.',origin:'Lyon',date:'Août 2024',note:5,tags:['Calme','Décoration','Cuisine'],comment:'Jamais trouvé cet équilibre entre exotisme dépaysant et familiarité du terroir. Une œuvre.',active:true},
+        {id:'f3',name:'Claire M.',origin:'Bruxelles',date:'Juin 2024',note:4,tags:['Jardin','Piscine','Situation'],comment:'Les oliviers centenaires, le bassin zen, les cigales... Un vrai ressourcement.',active:true},
+        {id:'f4',name:'Marco & Luisa F.',origin:'Milano',date:'Septembre 2024',note:5,tags:['Architecture','Terrasse','Calme'],comment:'Mix Bali-Provenza straordinario. Torneremo presto.',active:true},
+        {id:'f5',name:'James & Sarah W.',origin:'London',date:'Mai 2024',note:5,tags:['Piscine','Décoration'],comment:'Absolutely magical. Unlike anything we have experienced.',active:false},
+      ]
+    }
+  },
+  get(k){try{const r=localStorage.getItem(k);return r?JSON.parse(r):null}catch{return null}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}},
+  getConfig(){return this.get(this.K.C)||JSON.parse(JSON.stringify(this.defaults.config))},
+  getBookings(){return this.get(this.K.B)||[]},
+  getReviews(){return this.get(this.K.R)||JSON.parse(JSON.stringify(this.defaults.reviews))},
+  getContacts(){return this.get(this.K.CT)||[]},
+  save(k,v){this.set(k,v)},
+  init(){
+    if(!this.get(this.K.C))this.set(this.K.C,this.defaults.config);
+    if(!this.get(this.K.B))this.set(this.K.B,[]);
+    if(!this.get(this.K.R))this.set(this.K.R,this.defaults.reviews);
+    if(!this.get(this.K.CT))this.set(this.K.CT,[]);
+  },
+  getSatisfactionRate(){
+    const r=this.getReviews(),cfg=this.getConfig();
+    const real=r.real||[];
+    const all=real.length>=cfg.reviewThreshold?real:[...(r.fictitious||[]).filter(f=>f.active),...real];
+    if(!all.length)return null;
+    const avg=all.reduce((s,x)=>s+x.note,0)/all.length;
+    return{avg:Math.round(avg*10)/10,count:all.length,pct:Math.round((avg/5)*100)};
+  }
+};
+Store.init();
+
+function loadAll(){loadDashboard();}
+
+function editBilling(ref){
+  const bk=Store.getBookings(),b=bk.find(x=>(x.ref||x.id)===ref);
+  if(!b){toast("Réservation introuvable");return;}
+  const billing=b.billing||b.tenant||{};
+  const p=prompt("Prénom :",billing.prenom||"");if(p===null)return;
+  const n=prompt("Nom :",billing.nom||"");if(n===null)return;
+  const e=prompt("Email :",billing.email||"");if(e===null)return;
+  b.billing={...(b.billing||b.tenant||{}),prenom:p,nom:n,email:e,billing_modified:new Date().toISOString()};
+  Store.save(Store.K.B,bk);loadBookings();toast("Facturation mise à jour ✓");
+}
+
+// ── SÉCURITÉ — sanitisation ──
+function esc(s) {
+  if (!s) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
+// ── AUTH SÉCURISÉE ──
+const AUTH = {
+  MAX_ATTEMPTS: 3,
+  LOCKOUT_MS: 5 * 60 * 1000,   // 5 minutes
+  SESSION_MS: 4 * 60 * 60 * 1000, // 4 heures
+  KEY_ATTEMPTS: 'virevent_auth_attempts',
+  KEY_LOCKOUT:  'virevent_auth_lockout',
+  KEY_SESSION:  'virevent_admin_session',
+
+  getAttempts(){ try{return parseInt(localStorage.getItem(this.KEY_ATTEMPTS)||'0',10);}catch(e){return 0;} },
+  setAttempts(n){ try{localStorage.setItem(this.KEY_ATTEMPTS,String(n));}catch(e){} },
+  getLockout(){ try{return parseInt(localStorage.getItem(this.KEY_LOCKOUT)||'0',10);}catch(e){return 0;} },
+  setLockout(ts){ try{localStorage.setItem(this.KEY_LOCKOUT,String(ts));}catch(e){} },
+
+  isLocked(){
+    const lockoutUntil = this.getLockout();
+    if(!lockoutUntil) return false;
+    if(Date.now() < lockoutUntil) return true;
+    // Délai expiré — réinitialiser
+    this.setAttempts(0); this.setLockout(0); return false;
+  },
+
+  lockoutRemaining(){
+    const ms = this.getLockout() - Date.now();
+    return ms > 0 ? Math.ceil(ms/1000) : 0;
+  },
+
+  createSession(){
+    const token = btoa(String(Date.now())+':'+Math.random());
+    try{ localStorage.setItem(this.KEY_SESSION, JSON.stringify({token, exp: Date.now()+this.SESSION_MS})); }catch(e){}
+    return token;
+  },
+
+  hasValidSession(){
+    try{
+      const s = JSON.parse(localStorage.getItem(this.KEY_SESSION)||'null');
+      return s && s.token && Date.now() < s.exp;
+    }catch(e){ return false; }
+  },
+
+  clearSession(){ try{localStorage.removeItem(this.KEY_SESSION);}catch(e){} }
+};
+
+let otpCode='';
+let _sessionTimer = null;
+
+function checkPwd(){
+  const errEl = document.getElementById('pwd-err');
+
+  if(AUTH.isLocked()){
+    errEl.textContent=`Trop de tentatives. Réessayez dans ${AUTH.lockoutRemaining()} secondes.`;
+    return;
+  }
+
+  const cfg = Store.getConfig();
+  const pwd = document.getElementById('pwd-input').value;
+
+  if(pwd === cfg.adminPassword){
+    AUTH.setAttempts(0);
+    AUTH.setLockout(0);
+    AUTH.createSession();
+    _openDashboard();
+  } else {
+    const attempts = AUTH.getAttempts() + 1;
+    AUTH.setAttempts(attempts);
+    const remaining = AUTH.MAX_ATTEMPTS - attempts;
+    if(remaining <= 0){
+      AUTH.setLockout(Date.now() + AUTH.LOCKOUT_MS);
+      AUTH.setAttempts(0);
+      errEl.textContent='Accès bloqué pendant 5 minutes suite à trop de tentatives.';
+    } else {
+      errEl.textContent=`Mot de passe incorrect. ${remaining} essai${remaining>1?'s':''} restant${remaining>1?'s':''}.`;
+    }
+    // Vider le champ
+    document.getElementById('pwd-input').value='';
+  }
+}
+
+function _openDashboard(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  loadAll();
+  resetSessionTimer();
+  document.addEventListener('click', resetSessionTimer);
+  document.addEventListener('keydown', resetSessionTimer);
+  // Afficher le timer de session dans la sidebar
+  _updateSessionDisplay();
+  setInterval(_updateSessionDisplay, 60000);
+}
+
+function _updateSessionDisplay(){
+  const el = document.getElementById('session-indicator');
+  if(!el) return;
+  try {
+    const s = JSON.parse(localStorage.getItem(AUTH.KEY_SESSION)||'null');
+    if(s && s.exp){
+      const minsLeft = Math.max(0, Math.floor((s.exp - Date.now()) / 60000));
+      const h = Math.floor(minsLeft/60), m = minsLeft%60;
+      el.textContent = `Session : ${h}h${m.toString().padStart(2,'0')} restant${minsLeft<30?' ⚠️':''}`;
+      el.style.color = minsLeft < 30 ? 'rgba(224,112,96,.7)' : 'rgba(138,123,106,.5)';
+    }
+  } catch(e){}
+}
+
+function resetSessionTimer(){
+  clearTimeout(_sessionTimer);
+  _sessionTimer = setTimeout(()=>{
+    logout();
+    alert('Session expirée pour des raisons de sécurité. Veuillez vous reconnecter.');
+  }, AUTH.SESSION_MS);
+}
+
+function checkOtp(){}
+
+function logout(){
+  AUTH.clearSession();
+  clearTimeout(_sessionTimer);
+  document.removeEventListener('click', resetSessionTimer);
+  document.removeEventListener('keydown', resetSessionTimer);
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('pwd-input').value='';
+  document.getElementById('pwd-err').textContent='';
+}
+
+// Vérifier session existante au chargement
+if(AUTH.hasValidSession()){
+  _openDashboard();
+}
+
+// ── NAV ──
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if(id==='dashboard')loadDashboard();
+  if(id==='textes')loadTextsPage();
+  if(id==='design')loadDesign();
+  if(id==='photos')loadPhotos();
+  if(id==='tarifs')loadTarifs();
+  if(id==='calendar')loadCalendar();
+  if(id==='bookings')loadBookings();
+  if(id==='contacts')loadContacts();
+  if(id==='reviews'){
+    loadReviews();
+    // Clear new-review badge
+    document.querySelector('.rv-badge')?.remove();
+  }
+  if(id==='settings')loadSettings();
+  if(id==='partners'){loadPartners_admin();}
+}
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+// ── BROADCAST SYNC — mise à jour automatique index.html ──
+const _bc = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('virevent_sync') : null;
+// Écouter les nouveaux avis soumis depuis index.html
+if (_bc) {
+  _bc.onmessage = function(e) {
+    if (e.data && e.data.type === 'new_review') {
+      // Flash badge dans la sidebar si on est sur la page avis
+      const link = document.querySelector('.sb-link[onclick*="reviews"]');
+      if (link && !link.querySelector('.rv-badge')) {
+        const badge = document.createElement('span');
+        badge.className = 'rv-badge';
+        badge.style.cssText = 'background:var(--gold);color:var(--bg);font-size:.44rem;padding:.1rem .3rem;margin-left:.35rem;letter-spacing:.1em';
+        badge.textContent = 'NOUVEAU';
+        link.appendChild(badge);
+      }
+      // Recharger si déjà sur la page avis
+      if (document.getElementById('page-reviews')?.classList.contains('active')) {
+        loadReviews();
+      }
+    }
+  };
+}
+
+function broadcastSync() {
+  // Signal via BroadcastChannel (même origine, onglets ouverts)
+  if (_bc) _bc.postMessage({ type: 'sync', ts: Date.now() });
+  // Fallback : écrire une clé de trigger dans localStorage (déclenche l'event 'storage' sur index.html)
+  try {
+    localStorage.setItem('virevent_sync_trigger', Date.now().toString());
+  } catch(e) {}
+  _showSyncBadge();
+}
+
+function _showSyncBadge() {
+  // Flash badge "Synchronisé" dans la sidebar footer
+  const ind = document.getElementById('session-indicator');
+  if (!ind) return;
+  const prev = ind.textContent;
+  ind.innerHTML = '<span class="sync-badge synced">✓ Synchronisé</span>';
+  setTimeout(() => { ind.textContent = prev || 'Session active'; }, 2500);
+}
+
+// ── TEXTS MANAGEMENT ──
+
+function setInputVal(key, lg, val) {
+  const el = document.getElementById('txt-' + lg + '-' + key.replace(/\./g,'_'));
+  if (!el) return;
+  el.value = val;
+}
+
+// ── TEXTES DU SITE ──
+let SITE_SECTIONS = null;
+function _getSiteSections() {
+  if (!SITE_SECTIONS) {
+    try {
+      const el = document.getElementById('site-sections-data');
+      SITE_SECTIONS = el ? JSON.parse(el.textContent) : [];
+    } catch(e) { SITE_SECTIONS = []; }
+  }
+  return SITE_SECTIONS;
+}
+
+let _savedFR = {}, _savedEN = {};
+
+function loadTextsPage() {
+  try {
+    _savedFR = JSON.parse(localStorage.getItem('virevent_texts_fr') || '{}');
+    _savedEN = JSON.parse(localStorage.getItem('virevent_texts_en') || '{}');
+  } catch(e) { _savedFR = {}; _savedEN = {}; }
+
+  const container = document.getElementById('texts-sections-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  _getSiteSections().forEach(sec => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.marginBottom = '1.25rem';
+
+    // Section header
+    const header = document.createElement('div');
+    header.className = 'card-title';
+    header.textContent = sec.label;
+    card.appendChild(header);
+
+    // Column headers
+    const colHead = document.createElement('div');
+    colHead.style.cssText = 'display:grid;grid-template-columns:160px 1fr 1fr;gap:.5rem;margin-bottom:.5rem;padding:0 .25rem';
+    colHead.innerHTML = '<div style="font-size:.46rem;letter-spacing:.18em;text-transform:uppercase;color:var(--stone)">Champ</div>'
+      + '<div style="font-size:.46rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)">🇫🇷 Français</div>'
+      + '<div style="font-size:.46rem;letter-spacing:.18em;text-transform:uppercase;color:var(--jade-light)">🇬🇧 English</div>';
+    card.appendChild(colHead);
+
+    sec.fields.forEach(f => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:grid;grid-template-columns:160px 1fr 1fr;gap:.5rem;margin-bottom:.5rem;align-items:start';
+
+      // Label
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'font-size:.6rem;color:var(--stone-light);padding-top:.4rem;line-height:1.3';
+      lbl.textContent = f.label;
+      row.appendChild(lbl);
+
+      // FR field
+      const frEl = f.long ? document.createElement('textarea') : document.createElement('input');
+      frEl.id = 'tf_fr_' + f.key.replace(/\./g,'_');
+      frEl.value = _savedFR[f.key] !== undefined ? _savedFR[f.key] : (f.fr || '');
+      frEl.placeholder = f.fr || '';
+      frEl.className = 'txt-field txt-field-fr';
+      if (!f.long) frEl.type = 'text';
+      else { frEl.rows = 2; frEl.style.resize = 'vertical'; }
+
+      row.appendChild(frEl);
+
+      // EN field
+      const enEl = f.long ? document.createElement('textarea') : document.createElement('input');
+      enEl.id = 'tf_en_' + f.key.replace(/\./g,'_');
+      enEl.value = _savedEN[f.key] !== undefined ? _savedEN[f.key] : (f.en || '');
+      enEl.placeholder = f.en || '';
+      enEl.className = 'txt-field txt-field-en';
+      if (!f.long) enEl.type = 'text';
+      else { enEl.rows = 2; enEl.style.resize = 'vertical'; }
+
+      row.appendChild(enEl);
+
+      card.appendChild(row);
+    });
+
+    container.appendChild(card);
+  });
+}
+
+function saveTexts() {
+  const fr = {}, en = {};
+  _getSiteSections().forEach(sec => {
+    sec.fields.forEach(f => {
+      const fEl = document.getElementById('tf_fr_' + f.key.replace(/\./g,'_'));
+      const eEl = document.getElementById('tf_en_' + f.key.replace(/\./g,'_'));
+      if (fEl) fr[f.key] = fEl.value.trim() || f.fr || '';
+      if (eEl) en[f.key] = eEl.value.trim() || f.en || '';
+    });
+  });
+  try {
+    localStorage.setItem('virevent_texts_fr', JSON.stringify(fr));
+    localStorage.setItem('virevent_texts_en', JSON.stringify(en));
+  } catch(e) { toast('Erreur de sauvegarde'); return; }
+  broadcastSync();
+  toast('Textes publiés sur le site ✓');
+}
+
+
+function loadDashboard(){
+  const cfg=Store.getConfig(),bk=Store.getBookings(),ct=Store.getContacts(),sat=Store.getSatisfactionRate();
+  const rev=Store.getReviews();
+  const realCount=(rev.real||[]).length;
+  document.getElementById('stats-grid').innerHTML=`
+    <div class="stat"><div class="stat-label">Réservations totales</div><div class="stat-val gold">${bk.length}</div><div class="stat-sub">dont ${bk.filter(b=>b.status==='confirmed').length} confirmées</div></div>
+    <div class="stat"><div class="stat-label">Taux de satisfaction</div><div class="stat-val jade">${sat?sat.avg+'/5':'—'}</div><div class="stat-sub">${sat?sat.count+' avis':'Aucun avis'}</div></div>
+    <div class="stat"><div class="stat-label">Messages reçus</div><div class="stat-val">${ct.length}</div><div class="stat-sub">${ct.filter(c=>!c.read).length} non lus</div></div>
+    <div class="stat"><div class="stat-label">Vrais avis clients</div><div class="stat-val">${realCount}</div><div class="stat-sub">Seuil fictifs: ${cfg.reviewThreshold}</div></div>
+  `;
+  const upcoming=bk.filter(b=>new Date(b.arrive)>=new Date()).sort((a,b)=>new Date(a.arrive)-new Date(b.arrive)).slice(0,4);
+  document.getElementById('dash-bookings').innerHTML=upcoming.length?upcoming.map(b=>`
+    <div style="padding:0.75rem 0;border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-size:0.8rem;color:var(--cream)">${b.name}</div><div style="font-size:0.65rem;color:var(--stone)">${fmtDate(b.arrive)} → ${fmtDate(b.depart)}</div></div>
+      <span class="badge jade">${b.nuits}n</span>
+    </div>`).join(''):'<div style="font-size:0.75rem;color:var(--stone);padding:1rem 0">Aucune réservation à venir</div>';
+  const recent=ct.slice(-4).reverse();
+  document.getElementById('dash-contacts').innerHTML=recent.length?recent.map(c=>`
+    <div style="padding:0.75rem 0;border-bottom:0.5px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;margin-bottom:0.2rem">
+        <span style="font-size:0.78rem;color:var(--cream)">${c.name}</span>
+        <span style="font-size:0.62rem;color:var(--stone)">${c.date}</span>
+      </div>
+      <div style="font-size:0.7rem;color:var(--stone-light)">${c.message.substring(0,80)}…</div>
+    </div>`).join(''):'<div style="font-size:0.75rem;color:var(--stone);padding:1rem 0">Aucun message</div>';
+}
+
+// ── DESIGN ──
+const COLOR_FIELDS=[
+  {id:'colorBg',    label:'Fond principal'},
+  {id:'colorBg2',   label:'Fond secondaire'},
+  {id:'colorBg3',   label:'Fond tertiaire'},
+  {id:'colorNavBg', label:'Couleur barre de menu (navbar)'},
+  {id:'colorGold',  label:'Couleur or (accents)'},
+  {id:'colorJade',  label:'Couleur jade (verdure)'},
+  {id:'colorCream', label:'Texte principal'},
+  {id:'colorStone', label:'Texte secondaire'},
+  {id:'colorTarifHaute',  label:'Tarifs — bordure & badge Haute saison'},
+  {id:'colorTarifMi',     label:'Tarifs — bordure & badge Mi-saison'},
+  {id:'colorTarifBasse',  label:'Tarifs — bordure & badge Basse saison'},
+  {id:'colorTarifSpecial',label:'Tarifs — bordure & badge Périodes spéciales'},
+];
+function loadDesign(){
+  const cfg=Store.getConfig();
+  // Lire la couleur nav depuis localStorage si elle a été sauvée
+  const savedNavBg=(() => {try{return localStorage.getItem('virevent_nav_bg')||null;}catch(e){return null;}})();
+  const navBg = savedNavBg || cfg.colorNavBg || '#0C0A07';
+  cfg.colorNavBg = navBg;
+  // Defaults pour les couleurs tarifs
+  if(!cfg.colorTarifHaute)   cfg.colorTarifHaute   = '#C49553';
+  if(!cfg.colorTarifMi)      cfg.colorTarifMi      = '#4AA072';
+  if(!cfg.colorTarifBasse)   cfg.colorTarifBasse   = '#808493';
+  if(!cfg.colorTarifSpecial) cfg.colorTarifSpecial = '#4AA072';
+  document.getElementById('color-grid').innerHTML=COLOR_FIELDS.map(f=>`
+    <div class="color-field">
+      <label class="field-label">${f.label}</label>
+      <div class="color-preview">
+        <input type="color" class="field-input" id="${f.id}" value="${cfg[f.id]||'#000000'}" style="width:60px">
+        <input type="text" class="field-input" id="${f.id}_hex" value="${cfg[f.id]||'#000000'}" style="flex:1;font-size:0.8rem"
+          oninput="document.getElementById('${f.id}').value=this.value">
+      </div>
+    </div>`).join('');
+  COLOR_FIELDS.forEach(f=>{
+    document.getElementById(f.id).addEventListener('input',function(){
+      document.getElementById(f.id+'_hex').value=this.value;
+    });
+  });
+  setVal('font-serif',cfg.fontSerif);setVal('font-sans',cfg.fontSans);
+  setVal('cfg-siteName',cfg.siteName);setVal('cfg-tagline',cfg.tagline);
+  setVal('cfg-location',cfg.location);setVal('cfg-email',cfg.email);
+}
+function saveDesign(){
+  const cfg=Store.getConfig();
+  COLOR_FIELDS.forEach(f=>cfg[f.id]=document.getElementById(f.id).value);
+  cfg.fontSerif=getVal('font-serif');cfg.fontSans=getVal('font-sans');
+  cfg.siteName=getVal('cfg-siteName');cfg.tagline=getVal('cfg-tagline');
+  cfg.location=getVal('cfg-location');cfg.email=getVal('cfg-email');
+  // Sauvegarder la couleur nav dans localStorage pour le site public
+  try{localStorage.setItem('virevent_nav_bg', cfg.colorNavBg||'#0C0A07');}catch(e){}
+  // Sauvegarder les couleurs des cartes tarifs
+  const tarifColors = {
+    haute:   cfg.colorTarifHaute   || '#C49553',
+    mi:      cfg.colorTarifMi      || '#4AA072',
+    basse:   cfg.colorTarifBasse   || '#808493',
+    special: cfg.colorTarifSpecial || '#4AA072',
+  };
+  try{localStorage.setItem('virevent_tarif_colors', JSON.stringify(tarifColors));}catch(e){}
+  Store.save(Store.K.C,cfg);broadcastSync();toast('Couleurs & polices enregistrées ✓');
+}
+
+// ── PHOTOS ──
+// ── PHOTOS — nouvelle version ──
+const SECTION_PHOTO_DEFS = [
+  {id:'hero',       label:'Hero — image plein écran'},
+  {id:'villa_bg',   label:'Villa — fond de section'},
+  {id:'villa_img',  label:'Villa — photo principale'},
+  {id:'tarifs_bg',  label:'Tarifs — fond de section'},
+  {id:'avis_bg',    label:'Avis — fond de section'},
+  {id:'contact_bg', label:'Contact — fond de section'},
+];
+
+function getPhotoUrl(id) {
+  try { return localStorage.getItem('virevent_photo_'+id) || null; } catch(e) { return null; }
+}
+
+function _getGallerySlots() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('virevent_gallery_slots') || 'null');
+    if (saved && Array.isArray(saved) && saved.length > 0) return saved;
+  } catch(e) {}
+  // Try legacy individual keys
+  const slots = [];
+  for (let i = 1; i <= 20; i++) {
+    const key = i <= 5 ? `virevent_photo_gal${i}` : `virevent_gallery_${i}`;
+    try {
+      const url = localStorage.getItem(key);
+      if (url) slots.push({id: `gal_slot_${i}`, url, label: `Photo ${i}`, order: i-1});
+    } catch(e) {}
+  }
+  // Always return at least 5 empty slots so the grid is visible
+  if (slots.length === 0) {
+    for (let i = 0; i < 5; i++) {
+      slots.push({id: `gal_slot_${i+1}`, url: '', label: `Photo ${i+1}`, order: i});
+    }
+  }
+  return slots;
+}
+
+function _saveGallerySlots(slots) {
+  try { localStorage.setItem('virevent_gallery_slots', JSON.stringify(slots)); } catch(e) {}
+  for (let i = 1; i <= 20; i++) {
+    const key = i <= 5 ? `virevent_photo_gal${i}` : `virevent_gallery_${i}`;
+    try { localStorage.removeItem(key); } catch(e) {}
+  }
+  slots.forEach((s, i) => {
+    const key = i < 5 ? `virevent_photo_gal${i+1}` : `virevent_gallery_${i+1}`;
+    try { if (s.url) localStorage.setItem(key, s.url); } catch(e) {}
+  });
+}
+
+function loadPhotos() {
+  try { _renderGalleryGrid(); } catch(e){ console.error('Gallery grid error:', e); }
+  try { _renderSectionPhotos(); } catch(e){ console.error('Section photos error:', e); }
+  try { _renderIdentityPhotos(); } catch(e){ console.error('Identity photos error:', e); }
+}
+
+function _renderGalleryGrid() {
+  const grid = document.getElementById('photo-grid-gallery');
+  if (!grid) return;
+  const slots = _getGallerySlots();
+  const maxSlots = 20;
+  grid.innerHTML = slots.map((s, i) => `
+    <div class="photo-slot ${s.url ? 'has-img' : ''}" id="gslot_${i}"
+         draggable="true"
+         ondragstart="_gDragStart(event,${i})"
+         ondragover="_gDragOver(event,${i})"
+         ondrop="_gDrop(event,${i})"
+         ondragleave="_gDragLeave(event,${i})">
+      ${s.url
+        ? `<img src="${s.url}" alt="${esc(s.label)}" loading="lazy">`
+        : `<div class="photo-slot-empty">
+             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width=".8"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+             <span>Vide</span>
+           </div>`}
+      <div class="photo-slot-label">Photo ${i+1}${s.label && s.label !== 'Photo '+(i+1) ? ' · '+esc(s.label) : ''}</div>
+      <div class="photo-slot-actions">
+        <label class="photo-slot-btn" title="Changer">
+          📷<input type="file" accept="image/*" style="display:none" onchange="_uploadGalleryPhoto(${i},this)">
+        </label>
+        <button class="photo-slot-btn" title="Renommer" onclick="_renameGallerySlot(${i})">✏️</button>
+        <button class="photo-slot-btn del" title="Supprimer" onclick="_deleteGallerySlot(${i})">✕</button>
+      </div>
+    </div>`).join('')
+    + (slots.length < maxSlots ? `
+    <div class="photo-slot" style="border-style:dashed;opacity:.5;cursor:pointer" onclick="addGallerySlot()">
+      <div class="photo-slot-empty">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>Ajouter</span>
+      </div>
+    </div>` : '');
+}
+
+let _gDragIdx = null;
+function _gDragStart(e, i) { _gDragIdx = i; e.currentTarget.classList.add('dragging'); }
+function _gDragOver(e, i)  { e.preventDefault(); if(i !== _gDragIdx) document.getElementById('gslot_'+i)?.classList.add('drag-over'); }
+function _gDragLeave(e, i) { document.getElementById('gslot_'+i)?.classList.remove('drag-over'); }
+function _gDrop(e, i) {
+  e.preventDefault();
+  document.getElementById('gslot_'+i)?.classList.remove('drag-over');
+  document.getElementById('gslot_'+_gDragIdx)?.classList.remove('dragging');
+  if (_gDragIdx === null || _gDragIdx === i) { _gDragIdx = null; return; }
+  const slots = _getGallerySlots();
+  const [moved] = slots.splice(_gDragIdx, 1);
+  slots.splice(i, 0, moved);
+  _saveGallerySlots(slots);
+  _gDragIdx = null;
+  _renderGalleryGrid();
+  broadcastSync();
+}
+
+function addGallerySlot() {
+  const slots = _getGallerySlots();
+  if (slots.length >= 20) { toast('Maximum 20 photos atteint'); return; }
+  slots.push({id:'gal_slot_'+Date.now(), url:'', label:'Photo '+(slots.length+1), order:slots.length});
+  _saveGallerySlots(slots);
+  _renderGalleryGrid();
+  toast('Emplacement ajouté — cliquez 📷 pour uploader');
+}
+
+function _deleteGallerySlot(i) {
+  if (!confirm('Supprimer cette photo ?')) return;
+  const slots = _getGallerySlots();
+  slots.splice(i, 1);
+  _saveGallerySlots(slots);
+  _renderGalleryGrid();
+  broadcastSync();
+  toast('Photo supprimée');
+}
+
+function _renameGallerySlot(i) {
+  const slots = _getGallerySlots();
+  const cur = slots[i]?.label || '';
+  const name = prompt('Nom de la photo :', cur);
+  if (name === null) return;
+  slots[i].label = name.trim() || cur;
+  _saveGallerySlots(slots);
+  _renderGalleryGrid();
+}
+
+function _uploadGalleryPhoto(i, input) {
+  if (!input.files[0]) return;
+  const file = input.files[0];
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const MAX = 1400;
+      let w = img.width, h = img.height;
+      if (w > MAX) { h = Math.round(h*MAX/w); w = MAX; }
+      if (h > MAX) { w = Math.round(w*MAX/h); h = MAX; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      // Try quality 0.82, fall back to 0.6 if storage quota issue
+      let compressed = canvas.toDataURL('image/jpeg', 0.82);
+      const slots = _getGallerySlots();
+      while (slots.length <= i) slots.push({id:'gal_slot_'+(slots.length+1), url:'', label:'Photo '+(slots.length+1), order:slots.length});
+      slots[i].url = compressed;
+      try {
+        _saveGallerySlots(slots);
+      } catch(e) {
+        // Quota exceeded — retry with lower quality
+        try {
+          compressed = canvas.toDataURL('image/jpeg', 0.5);
+          slots[i].url = compressed;
+          _saveGallerySlots(slots);
+          toast('⚠️ Image compressée davantage (espace limité)');
+        } catch(e2) {
+          toast('❌ Espace de stockage insuffisant. Supprimez des photos existantes.');
+          input.value = '';
+          return;
+        }
+      }
+      _renderGalleryGrid();
+      broadcastSync();
+      toast('Photo '+(i+1)+' mise à jour ✓');
+    };
+    img.onerror = () => toast('❌ Impossible de lire cette image.');
+    img.src = ev.target.result;
+  };
+  reader.onerror = () => toast('❌ Erreur de lecture du fichier.');
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function _renderSectionPhotos() {
+  const container = document.getElementById('photo-grid-sections');
+  if (!container) return;
+  container.innerHTML = SECTION_PHOTO_DEFS.map(s => {
+    const url = getPhotoUrl(s.id);
+    return `<div class="section-photo-slot">
+      <div style="font-size:.52rem;letter-spacing:.16em;text-transform:uppercase;color:var(--stone-light);margin-bottom:.3rem">${s.label}</div>
+      <div class="section-photo-preview">
+        ${url ? `<img src="${url}" alt="${esc(s.label)}">` : `<div class="sp-empty">Aucune image</div>`}
+      </div>
+      <div style="display:flex;gap:.4rem;margin-top:.35rem">
+        <label class="action-btn" style="flex:1;text-align:center;cursor:pointer;padding:.4rem .5rem;font-size:.55rem">
+          📷 Changer
+          <input type="file" accept="image/*" style="display:none" onchange="_uploadSectionPhoto('${s.id}',this)">
+        </label>
+        ${url ? `<button class="action-btn" style="background:none;border-color:rgba(224,112,96,.35);color:#E07060;padding:.4rem .6rem" onclick="_deleteSectionPhoto('${s.id}')">✕</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function _uploadSectionPhoto(id, input) {
+  if (!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const MAX = 1800;
+      let w = img.width, h = img.height;
+      if (w > MAX) { h = Math.round(h*MAX/w); w = MAX; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', 0.82);
+      try { localStorage.setItem('virevent_photo_'+id, compressed); } catch(e) { toast('Image trop lourde — essayez une image plus petite'); return; }
+      _renderSectionPhotos();
+      broadcastSync();
+      toast('Fond mis à jour ✓');
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function _deleteSectionPhoto(id) {
+  if (!confirm('Supprimer ce fond de page ?')) return;
+  try { localStorage.removeItem('virevent_photo_'+id); } catch(e) {}
+  _renderSectionPhotos();
+  broadcastSync();
+  toast('Fond supprimé');
+}
+
+function _renderIdentityPhotos() {
+  const container = document.getElementById('photo-grid-identity');
+  if (!container) return;
+  const logoUrl = getPhotoUrl('logo');
+  const logoText = localStorage.getItem('virevent_logo_text') || '';
+  container.innerHTML = `
+    <div class="section-photo-slot">
+      <div style="font-size:.52rem;letter-spacing:.16em;text-transform:uppercase;color:var(--stone-light);margin-bottom:.3rem">Logo (image PNG/SVG)</div>
+      <div class="section-photo-preview" style="background:var(--bg2)">
+        ${logoUrl ? `<img src="${logoUrl}" alt="Logo" style="object-fit:contain;padding:.5rem">` : `<div class="sp-empty">Aucun logo image</div>`}
+      </div>
+      <div style="display:flex;gap:.4rem;margin-top:.35rem">
+        <label class="action-btn" style="flex:1;text-align:center;cursor:pointer;padding:.4rem .5rem;font-size:.55rem">
+          📷 Uploader logo
+          <input type="file" accept="image/*,image/svg+xml" style="display:none" onchange="_uploadSectionPhoto('logo',this);setTimeout(_renderIdentityPhotos,800)">
+        </label>
+        ${logoUrl ? `<button class="action-btn" style="background:none;border-color:rgba(224,112,96,.35);color:#E07060;padding:.4rem .6rem" onclick="_deleteSectionPhoto('logo');setTimeout(_renderIdentityPhotos,100)">✕</button>` : ''}
+      </div>
+    </div>
+    <div class="section-photo-slot">
+      <div style="font-size:.52rem;letter-spacing:.16em;text-transform:uppercase;color:var(--stone-light);margin-bottom:.3rem">Logo texte (si pas d'image)</div>
+      <div style="font-size:.6rem;color:var(--stone);margin-bottom:.5rem;line-height:1.5">HTML autorisé : &lt;em&gt;, &lt;strong&gt;</div>
+      <input class="field-input" id="logo-text-input" value="${esc(logoText)}" placeholder="<em>Le Petit</em> Virevent">
+      <button class="action-btn" style="margin-top:.5rem" onclick="_saveLogoText()">Enregistrer le texte</button>
+    </div>`;
+}
+
+function _saveLogoText() {
+  const val = document.getElementById('logo-text-input')?.value || '';
+  try { localStorage.setItem('virevent_logo_text', val); } catch(e) {}
+  broadcastSync();
+  toast('Logo texte enregistré ✓');
+}
+
+function savePhotos() {
+  broadcastSync();
+  toast('Photos enregistrées et synchronisées ✓');
+}
+
+// ── TARIFS ──
+// ── TARIFS ──
+
+// Default season ranges: [{from:'MM-DD', to:'MM-DD'}]
+const DEFAULT_TARIFS_CFG = {
+  haute: {
+    ratePN: 543,
+    ranges: [{from:'07-01', to:'08-31'}],
+    label: 'Haute saison', labelEn: 'High season'
+  },
+  mi: {
+    ratePN: 386,
+    ranges: [{from:'04-01', to:'06-30'}, {from:'09-01', to:'10-31'}],
+    label: 'Mi-saison', labelEn: 'Mid season'
+  },
+  basse: {
+    ratePN: 271,
+    ranges: [],
+    label: 'Basse saison', labelEn: 'Low season'
+  },
+  xmas: {
+    ratePN: 486,
+    ranges: [{from:'12-24', to:'01-02'}],
+    label: 'Noël & Nouvel An', labelEn: 'Christmas & New Year'
+  },
+  easter: {
+    ratePN: 386,
+    ranges: [],
+    label: 'Vacances de Pâques', labelEn: 'Easter Holidays'
+  },
+  caution: 1500, taxeSejour: 1.50, minNuitsBasse: 7,
+  svcRates: { menagePN: 120, piscinePN: 80, bebePN: 5 }
+};
+
+function _loadTarifsCfg() {
+  try {
+    const raw = localStorage.getItem('virevent_tarifs_config');
+    if (raw) {
+      const c = JSON.parse(raw);
+      // Migrate old month-based config to ranges if needed
+      if (c.haute && c.haute.months && !c.haute.ranges) {
+        c.haute.ranges = _monthsToRanges(c.haute.months);
+        c.mi.ranges    = _monthsToRanges(c.mi.months);
+        c.basse.ranges = [];
+      }
+      return c;
+    }
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(DEFAULT_TARIFS_CFG));
+}
+
+// Migrate helper: convert old month array to approximate ranges
+function _monthsToRanges(months) {
+  if (!months || !months.length) return [];
+  const sorted = [...months].sort((a,b) => a-b);
+  const ranges = [];
+  let start = sorted[0];
+  let prev  = sorted[0];
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] === prev + 1) { prev = sorted[i]; }
+    else {
+      ranges.push({from: _mmdd(start, 1), to: _mmdd(prev, 28)});
+      start = sorted[i]; prev = sorted[i];
+    }
+  }
+  ranges.push({from: _mmdd(start, 1), to: _mmdd(prev, 28)});
+  return ranges;
+}
+function _mmdd(month, day) {
+  return String(month+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+}
+
+function loadTarifs() {
+  const cfg = _loadTarifsCfg();
+
+  setVal('tarif-haute-pn',   cfg.haute.ratePN);
+  setVal('tarif-mi-pn',      cfg.mi.ratePN);
+  setVal('tarif-basse-pn',   cfg.basse.ratePN);
+  setVal('tarif-xmas-pn',    cfg.xmas   ? cfg.xmas.ratePN   : 486);
+  setVal('tarif-easter-pn',  cfg.easter ? cfg.easter.ratePN : 386);
+  setVal('tarif-caution',    cfg.caution);
+  setVal('tarif-taxe',       cfg.taxeSejour);
+  setVal('tarif-minNuits',   cfg.minNuitsBasse);
+  // Services
+  const svc = cfg.svcRates || {};
+  setVal('svc-menage-pn',  svc.menagePN  ?? 120);
+  setVal('svc-piscine-pn', svc.piscinePN ?? 80);
+  setVal('svc-bebe-pn',    svc.bebePN    ?? 5);
+
+  ['haute','mi','basse','xmas','easter'].forEach(s => {
+    _updateHint(s, cfg[s] ? cfg[s].ratePN : 0);
+    _renderRanges(s, (cfg[s] && cfg[s].ranges) || []);
+  });
+
+  loadPromoCodes_admin();
+  loadPopupConfig();
+}
+
+function _renderRanges(saison, ranges) {
+  const el = document.getElementById('ranges-' + saison);
+  if (!el) return;
+  el.innerHTML = '';
+
+  if (saison === 'basse') {
+    if (!ranges.length) {
+      el.innerHTML = '<div style="font-size:.62rem;color:var(--stone);line-height:1.6;padding:.4rem 0;font-style:italic">Automatique — tout jour non couvert par les autres saisons.</div>';
+      return;
+    }
+    // Fall through to render ranges normally (manual basse periods)
+  }
+
+  if (!ranges.length) {
+    el.innerHTML = '<div style="font-size:.62rem;color:var(--stone);margin-bottom:.4rem">Aucune tranche définie.</div>';
+    return;
+  }
+
+  ranges.forEach((r, i) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:.4rem;margin-bottom:.4rem';
+
+    const fromIn = document.createElement('input');
+    fromIn.type = 'date';
+    fromIn.className = 'field-input';
+    fromIn.id = `sr_${saison}_from_${i}`;
+    fromIn.style.cssText = 'flex:1;font-size:.68rem;padding:.35rem .5rem';
+    // Store as MM-DD, display needs a full date — use 2000 as neutral year
+    fromIn.value = r.from ? new Date().getFullYear()+'-' + r.from : '';
+    fromIn.title = 'Début de la période';
+
+    const sep = document.createElement('span');
+    sep.textContent = '→';
+    sep.style.cssText = 'font-size:.65rem;color:var(--stone);flex-shrink:0';
+
+    const toIn = document.createElement('input');
+    toIn.type = 'date';
+    toIn.className = 'field-input';
+    toIn.id = `sr_${saison}_to_${i}`;
+    toIn.style.cssText = 'flex:1;font-size:.68rem;padding:.35rem .5rem';
+    toIn.value = r.to ? new Date().getFullYear()+'-' + r.to : '';
+    toIn.title = 'Fin de la période';
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = '✕';
+    delBtn.style.cssText = 'background:none;border:.5px solid rgba(224,112,96,.35);color:#E07060;padding:.2rem .45rem;cursor:pointer;font-size:.6rem;flex-shrink:0;transition:all .15s';
+    delBtn.onclick = (function(s, idx){ return function(){ _removeRange(s, idx); }; })(saison, i);
+
+    row.appendChild(fromIn);
+    row.appendChild(sep);
+    row.appendChild(toIn);
+    row.appendChild(delBtn);
+    el.appendChild(row);
+  });
+}
+
+function addSeasonRange(saison) {
+  const cfg = _loadTarifsCfg();
+  _saveRangesFromDOM(cfg);
+  _saveCfg(cfg);
+  const cfg2 = _loadTarifsCfg();
+  if (!cfg2[saison]) cfg2[saison] = { ratePN: saison==='xmas'?486:386, ranges: [], label: saison, labelEn: saison };
+  cfg2[saison].ranges = cfg2[saison].ranges || [];
+  cfg2[saison].ranges.push({from:'', to:''});
+  _saveCfg(cfg2);
+  _renderRanges(saison, cfg2[saison].ranges);
+}
+
+function _removeRange(saison, idx) {
+  // Save current DOM state first
+  const cfg = _loadTarifsCfg();
+  _saveRangesFromDOM(cfg);
+  cfg[saison].ranges.splice(idx, 1);
+  _saveCfg(cfg);
+  _renderRanges(saison, cfg[saison].ranges);
+}
+
+function _saveRangesFromDOM(cfg) {
+  ['haute','mi','basse','xmas','easter'].forEach(s => {
+    if (!cfg[s]) return;
+    const ranges = cfg[s].ranges || [];
+    ranges.forEach((r, i) => {
+      const fEl = document.getElementById('sr_'+s+'_from_'+i);
+      const tEl = document.getElementById('sr_'+s+'_to_'+i);
+      if (fEl && fEl.value && fEl.value.length >= 5) r.from = fEl.value.slice(5);
+      if (tEl && tEl.value && tEl.value.length >= 5) r.to   = tEl.value.slice(5);
+    });
+  });
+}
+
+function _saveCfg(cfg) {
+  try { localStorage.setItem('virevent_tarifs_config', JSON.stringify(cfg)); } catch(e) {}
+}
+
+function _updateHint(saison, ratePN) {
+  const el = document.getElementById('hint-'+saison);
+  if (!el) return;
+  const sem = ratePN * 7;
+  const ht  = Math.round(ratePN / 1.10 * 100) / 100;
+  el.textContent = `→ ${sem.toLocaleString('fr-FR')} €/sem · HT ÷1,10 = ${ht.toLocaleString('fr-FR',{minimumFractionDigits:2})} €/nuit`;
+}
+
+document.addEventListener('input', e => {
+  const map = {
+    'tarif-haute-pn':'haute','tarif-mi-pn':'mi','tarif-basse-pn':'basse',
+    'tarif-xmas-pn':'xmas','tarif-easter-pn':'easter'
+  };
+  if (map[e.target.id]) _updateHint(map[e.target.id], +e.target.value || 0);
+});
+
+function saveTarifs() {
+  const cfg = _loadTarifsCfg();
+
+  cfg.haute.ratePN  = +getVal('tarif-haute-pn')   || 543;
+  cfg.mi.ratePN     = +getVal('tarif-mi-pn')       || 386;
+  cfg.basse.ratePN  = +getVal('tarif-basse-pn')    || 271;
+  cfg.caution       = +getVal('tarif-caution')     || 1500;
+  cfg.taxeSejour    = +getVal('tarif-taxe')        || 1.50;
+  cfg.minNuitsBasse = +getVal('tarif-minNuits')    || 7;
+
+  // Ensure xmas/easter exist
+  if (!cfg.xmas)   cfg.xmas   = { ratePN: 486, ranges: [], label: 'Noël & Nouvel An',    labelEn: 'Christmas & New Year' };
+  if (!cfg.easter) cfg.easter = { ratePN: 386, ranges: [], label: 'Vacances de Pâques', labelEn: 'Easter Holidays' };
+
+  cfg.xmas.ratePN   = +getVal('tarif-xmas-pn')    || 486;
+  cfg.easter.ratePN = +getVal('tarif-easter-pn')  || 386;
+
+  // Read ranges from DOM for all editable seasons including basse
+  ['haute','mi','basse','xmas','easter'].forEach(s => {
+    const saved = (cfg[s] && cfg[s].ranges) || [];
+    const updated = [];
+    saved.forEach((_, i) => {
+      const fEl = document.getElementById('sr_'+s+'_from_'+i);
+      const tEl = document.getElementById('sr_'+s+'_to_'+i);
+      const from = fEl?.value ? fEl.value.slice(5) : '';
+      const to   = tEl?.value ? tEl.value.slice(5) : '';
+      if (from && to) updated.push({from, to});
+    });
+    cfg[s].ranges = updated;
+  });
+
+  // Services optionnels
+  cfg.svcRates = {
+    menagePN:  +getVal('svc-menage-pn')  || 120,
+    piscinePN: +getVal('svc-piscine-pn') || 80,
+    bebePN:    +getVal('svc-bebe-pn')    || 5,
+  };
+
+  _saveCfg(cfg);
+
+  // Compat: save to Store
+  const storeCfg = Store.getConfig();
+  storeCfg.tarifHaute    = cfg.haute.ratePN * 7;
+  storeCfg.tarifMi       = cfg.mi.ratePN    * 7;
+  storeCfg.tarifBasse    = cfg.basse.ratePN * 7;
+  storeCfg.caution       = cfg.caution;
+  storeCfg.minNuitsBasse = cfg.minNuitsBasse;
+  Store.save(Store.K.C, storeCfg);
+
+  broadcastSync();
+  savePromoCodes_admin();
+  savePopupConfig();
+  savePartners_admin();
+  toast('Tarifs & périodes enregistrés ✓');
+}
+
+// ── CODES PROMO ──
+function loadPromoCodes_admin(){
+  const codes = (() => { try{return JSON.parse(localStorage.getItem('virevent_promo_codes')||'[]');}catch(e){return [];} })();
+  const el = document.getElementById('promo-codes-list');
+  if(!el) return;
+  if(!codes.length){ el.innerHTML=`<div style="font-size:.68rem;color:var(--stone)">Aucun code promo. Cliquez "+ Ajouter" pour en créer un.</div>`; return; }
+  el.innerHTML = codes.map((p,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 80px 80px auto;gap:.5rem;align-items:center;padding:.6rem .75rem;border:.5px solid var(--border);margin-bottom:.4rem;background:var(--bg4)">
+      <input class="field-input" value="${esc(p.code)}" placeholder="CODE" id="pc-code-${i}" style="font-family:monospace;text-transform:uppercase">
+      <select class="field-input" id="pc-type-${i}">
+        <option value="percent" ${p.type==='percent'?'selected':''}>% remise</option>
+        <option value="fixed"   ${p.type==='fixed'?'selected':''}>€ fixe</option>
+      </select>
+      <input class="field-input" type="number" value="${p.value}" id="pc-val-${i}" placeholder="10">
+      <select class="field-input" id="pc-active-${i}">
+        <option value="true"  ${p.active?'selected':''}>Actif</option>
+        <option value="false" ${!p.active?'selected':''}>Inactif</option>
+      </select>
+      <span style="font-size:.62rem;color:${p.active?'var(--jade-light)':'var(--stone)'}">
+        ${p.active?(p.type==='percent'?`−${p.value}%`:`−${p.value} €`):'Inactif'}
+      </span>
+      <button onclick="removePromoCode(${i})" style="background:none;border:.5px solid rgba(224,112,96,.3);color:#E07060;cursor:pointer;padding:.2rem .5rem;font-size:.65rem">✕</button>
+    </div>`).join('');
+  const addBtn = document.getElementById('btn-add-promo');
+  if(addBtn) addBtn.style.display = codes.length>=10 ? 'none' : '';
+}
+
+function addPromoCode(){
+  const codes = (() => { try{return JSON.parse(localStorage.getItem('virevent_promo_codes')||'[]');}catch(e){return [];} })();
+  if(codes.length>=10) return;
+  codes.push({code:'CODE'+(codes.length+1), type:'percent', value:10, active:true});
+  try{ localStorage.setItem('virevent_promo_codes', JSON.stringify(codes)); }catch(e){}
+  loadPromoCodes_admin();
+}
+
+function removePromoCode(i){
+  let codes = (() => { try{return JSON.parse(localStorage.getItem('virevent_promo_codes')||'[]');}catch(e){return [];} })();
+  codes.splice(i,1);
+  try{ localStorage.setItem('virevent_promo_codes', JSON.stringify(codes)); }catch(e){}
+  loadPromoCodes_admin();
+}
+
+function savePromoCodes_admin(){
+  const codes=[];
+  document.querySelectorAll('[id^="pc-code-"]').forEach((el,i)=>{
+    const code=el.value.trim().toUpperCase();
+    if(!code) return;
+    codes.push({
+      code, type:getVal('pc-type-'+i)||'percent',
+      value:+getVal('pc-val-'+i)||0,
+      active:getVal('pc-active-'+i)==='true'
+    });
+  });
+  try{ localStorage.setItem('virevent_promo_codes', JSON.stringify(codes)); }catch(e){}
+}
+
+// ── POP-UP CONFIG ──
+function loadPopupConfig(){
+  let cfg; try{ cfg=JSON.parse(localStorage.getItem('virevent_promo_popup')||'null'); }catch(e){ cfg=null; }
+  cfg = cfg||{active:false,delay:3,tag:'Offre spéciale',title:'',text:'',code:'',btnLabel:'Réserver maintenant',image:''};
+  setVal('popup-active', String(cfg.active));
+  setVal('popup-delay', cfg.delay||3);
+  setVal('popup-tag',   cfg.tag||'Offre spéciale');
+  setVal('popup-title', cfg.title||'');
+  setVal('popup-text',  cfg.text||'');
+  setVal('popup-code',  cfg.code||'');
+  setVal('popup-btn',   cfg.btnLabel||'Réserver maintenant');
+  setVal('popup-image', cfg.image||'');
+  if(cfg.image){
+    const prev=document.getElementById('popup-img-preview');
+    if(prev){ prev.style.display='block'; prev.querySelector('img').src=cfg.image; }
+  }
+}
+
+function uploadPopupImage(input){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image(); img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      const maxW=1200,maxH=600; let w=img.width,h=img.height;
+      if(w>maxW){h=Math.round(h*maxW/w);w=maxW;} if(h>maxH){w=Math.round(w*maxH/h);h=maxH;}
+      canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const data=canvas.toDataURL('image/jpeg',0.85);
+      setVal('popup-image',data);
+      const prev=document.getElementById('popup-img-preview');
+      if(prev){ prev.style.display='block'; prev.querySelector('img').src=data; }
+    }; img.src=e.target.result;
+  }; reader.readAsDataURL(file);
+}
+
+function savePopupConfig(){
+  const cfg={
+    active:getVal('popup-active')==='true',
+    delay:+getVal('popup-delay')||3,
+    tag:getVal('popup-tag')||'Offre spéciale',
+    title:getVal('popup-title')||'',
+    text:getVal('popup-text')||'',
+    code:getVal('popup-code')||'',
+    btnLabel:getVal('popup-btn')||'Réserver maintenant',
+    image:getVal('popup-image')||''
+  };
+  try{ localStorage.setItem('virevent_promo_popup', JSON.stringify(cfg)); }catch(e){}
+}
+
+// ── PARTENAIRES ──
+function loadPartners_admin(){
+  const partners=(() => {try{return JSON.parse(localStorage.getItem('virevent_partners')||'[]');}catch(e){return [];} })();
+  const el=document.getElementById('partners-list');
+  if(!el) return;
+  if(!partners.length){ el.innerHTML=`<div style="font-size:.68rem;color:var(--stone)">Aucun partenaire configuré.</div>`; return; }
+  el.innerHTML=partners.map((p,i)=>`
+    <div style="border:.5px solid var(--border);padding:.75rem;margin-bottom:.5rem;background:var(--bg4)">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:.5rem;align-items:start">
+        <div><label class="field-label">Nom *</label><input class="field-input" id="pt-name-${i}" value="${esc(p.name||'')}"></div>
+        <div><label class="field-label">URL * (https://…)</label><input class="field-input" id="pt-url-${i}" value="${esc(p.url||'')}" placeholder="https://"></div>
+        <div><label class="field-label">Description courte</label><input class="field-input" id="pt-desc-${i}" value="${esc(p.desc||'')}" placeholder="Optionnelle"></div>
+        <button onclick="removePartner(${i})" style="background:none;border:.5px solid rgba(224,112,96,.3);color:#E07060;cursor:pointer;padding:.3rem .6rem;font-size:.7rem;margin-top:1.1rem">✕</button>
+      </div>
+      <div style="margin-top:.5rem;display:flex;align-items:center;gap:.5rem">
+        <label class="photo-upload" style="font-size:.55rem">🖼 Logo<input type="file" accept="image/*" style="display:none" onchange="uploadPartnerLogo(${i},this)"></label>
+        <input class="field-input" id="pt-logo-${i}" value="${esc(p.logo||'')}" placeholder="URL logo ou base64" style="flex:1;font-size:.65rem">
+        ${p.logo?`<img src="${esc(p.logo)}" style="height:40px;max-width:120px;object-fit:contain;border:.5px solid var(--border);padding:2px;background:#fff;">`:''}
+      </div>
+    </div>`).join('');
+  const addBtn=document.getElementById('btn-add-partner');
+  if(addBtn) addBtn.style.display=partners.length>=10?'none':'';
+}
+
+function addPartner(){
+  const partners=(() => {try{return JSON.parse(localStorage.getItem('virevent_partners')||'[]');}catch(e){return [];} })();
+  if(partners.length>=10){ toast('Maximum 10 partenaires'); return; }
+  partners.push({name:'',url:'',desc:'',logo:''});
+  try{ localStorage.setItem('virevent_partners',JSON.stringify(partners)); }catch(e){}
+  loadPartners_admin();
+}
+
+function removePartner(i){
+  let p=(() => {try{return JSON.parse(localStorage.getItem('virevent_partners')||'[]');}catch(e){return [];} })();
+  p.splice(i,1);
+  try{ localStorage.setItem('virevent_partners',JSON.stringify(p)); }catch(e){}
+  loadPartners_admin();
+}
+
+function uploadPartnerLogo(i,input){
+  const file=input.files[0]; if(!file) return;
+  // Compress before storing
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      const maxW=300, maxH=120;
+      let w=img.width, h=img.height;
+      if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+      if(h>maxH){w=Math.round(w*maxH/h);h=maxH;}
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const dataUrl=canvas.toDataURL('image/png');
+      setVal('pt-logo-'+i, dataUrl);
+      // Auto-save so logo persists immediately
+      savePartners_admin();
+      broadcastSync();
+      loadPartners_admin();
+      toast('Logo uploadé ✓');
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function savePartners_admin(){
+  const partners=[];
+  document.querySelectorAll('[id^="pt-name-"]').forEach((el,i)=>{
+    const name=el.value.trim(); const url=getVal('pt-url-'+i).trim();
+    if(!name||!url) return;
+    partners.push({name, url, desc:getVal('pt-desc-'+i).trim(), logo:getVal('pt-logo-'+i).trim()});
+  });
+  try{ localStorage.setItem('virevent_partners',JSON.stringify(partners)); }catch(e){}
+  broadcastSync();
+}
+
+// ── CALENDAR ──
+function loadCalendar(){
+  const cfg=Store.getConfig();
+  renderBlockedList(cfg.blockedDates||[]);
+}
+function addBlockedDate(){
+  const s=getVal('block-start'),e=getVal('block-end'),r=getVal('block-reason');
+  if(!s||!e){toast('Dates requises');return;}
+  const cfg=Store.getConfig();
+  if(!cfg.blockedDates)cfg.blockedDates=[];
+  cfg.blockedDates.push({id:Date.now(),start:s,end:e,reason:r||'Bloqué'});
+  Store.save(Store.K.C,cfg);
+  renderBlockedList(cfg.blockedDates);
+  setVal('block-start','');setVal('block-end','');setVal('block-reason','');
+  broadcastSync();
+  toast('Période bloquée ajoutée ✓');
+}
+function removeBlocked(id){
+  const cfg=Store.getConfig();
+  cfg.blockedDates=(cfg.blockedDates||[]).filter(b=>b.id!==id);
+  Store.save(Store.K.C,cfg);renderBlockedList(cfg.blockedDates);
+}
+function saveCalendar(){toast('Calendrier enregistré ✓');}
+function renderBlockedList(list){
+  document.getElementById('blocked-list').innerHTML=list.length?
+    list.map(b=>`<div class="date-chip">${b.reason} · ${fmtDate(b.start)} → ${fmtDate(b.end)}<button onclick="removeBlocked(${b.id})">✕</button></div>`).join('')
+    :'<div style="font-size:0.75rem;color:var(--stone);padding:0.5rem 0">Aucune période bloquée</div>';
+}
+
+// ── BOOKINGS ──
+function loadBookings(){
+  const bk=(Store.getBookings()||[]).sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
+  const nf=v=>(v||0).toLocaleString('fr-FR')+' €';
+  const statusLabel=s=>s==='confirmed'?'Confirmé':s==='cancelled'?'Annulé':'En attente';
+  const statusCls=s=>s==='confirmed'?'jade':s==='cancelled'?'red':'gold';
+
+  document.getElementById('bookings-tbody').innerHTML=bk.length?bk.map(b=>{
+    const nom=esc(b.name||(b.tenant?(b.tenant.prenom+' '+b.tenant.nom):'—'));
+    const emailFull=esc(b.email||(b.tenant?b.tenant.email:'—'));
+    const arrive=fmtDate(b.arrive||(b.sejour?b.sejour.arrivee:'—'));
+    const depart=fmtDate(b.depart||(b.sejour?b.sejour.depart:'—'));
+    const nuits=b.nuits||(b.sejour?b.sejour.nuits:0);
+    const loyer=b.loyer||(b.finances?b.finances.loyer:0);
+    const ref=esc(b.ref||b.id||'');
+    const cgv=b.cgv_accepted?`<span class="badge jade" title="Acceptées le ${b.cgv_date?new Date(b.cgv_date).toLocaleDateString('fr-FR'):'—'}">CGV ✓</span>`:`<span class="badge gray">CGV ?</span>`;
+
+    // Composition du groupe — détail par catégorie d'âge
+    const tenant = b.tenant || {};
+    let guestDetail = '';
+    if (tenant.guestSummary) {
+      guestDetail = esc(tenant.guestSummary);
+    } else if (tenant.adultes || tenant.enfants) {
+      const a = tenant.adultes || 0;
+      const e = tenant.enfants || 0;
+      guestDetail = `${a} adulte${a>1?'s':''}${e>0?' · '+e+' enfant'+(e>1?'s':''):''}`;
+    } else {
+      const p = tenant.personnes || b.personnes || b.sejour?.personnes || '—';
+      guestDetail = `${p} pers.`;
+    }
+    const totalPers = tenant.voyageurs || tenant.personnes || b.personnes || '—';
+
+    const services=b.finances?[
+      b.finances.menage>0?`Ménage ${nf(b.finances.menage)}`:'',
+      b.finances.piscine>0?`Piscine ${nf(b.finances.piscine)}`:'',
+      b.finances.bebe>0?`Lit bébé ${nf(b.finances.bebe)}`:'',
+    ].filter(Boolean).join(' · '):'';
+    const rawRef=b.ref||b.id||'';
+    const srcBadge=b._source==='site'?'<span class="badge jade" style="font-size:.44rem;padding:.1rem .3rem">SITE</span>':'';
+
+    return `<tr>
+      <td style="font-size:0.68rem;color:var(--stone)">${ref} ${srcBadge}<br><span style="font-size:.58rem;opacity:.6">${b.date?new Date(b.date).toLocaleDateString('fr-FR'):''}</span></td>
+      <td>${nom}<br><span style="font-size:0.65rem;color:var(--stone)">${emailFull}</span></td>
+      <td>${arrive}</td>
+      <td>${depart}</td>
+      <td>${nuits}n<br><span style="font-size:.62rem;color:var(--stone-light)">${guestDetail}</span></td>
+      <td>${nf(loyer)}<br><span style="font-size:.62rem;color:var(--stone)">${services}</span></td>
+      <td>${cgv}</td>
+      <td><span class="badge ${statusCls(b.status)}">${statusLabel(b.status)}</span></td>
+      <td>
+        <button class="action-btn" onclick="viewBookingReceipt(${JSON.stringify(rawRef)})">Reçu</button>
+        <button class="action-btn" onclick="viewBookingInvoice(${JSON.stringify(rawRef)})" style="border-color:var(--gold);color:var(--gold)">Facture</button>
+        <button class="action-btn" onclick="editBilling(${JSON.stringify(rawRef)})" style="border-color:var(--jade-light);color:var(--jade-light)">Modifier facturation</button>
+        <button class="action-btn danger" onclick="cancelBooking(${JSON.stringify(rawRef)})">Annuler</button>
+      </td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="9" style="color:var(--stone);padding:1.5rem 0">Aucune réservation enregistrée</td></tr>';
+  const _bcfg=Store.getConfig(),_blist=_bcfg.blockedDates||[],_bt=document.getElementById('blocked-tbody');
+  if(_bt)_bt.innerHTML=_blist.length?_blist.map(b=>{const _s=b.start?new Date(b.start):null,_e=b.end?new Date(b.end):null,_n=(_s&&_e)?Math.round((_e-_s)/86400000):'—';return `<tr><td><span class="badge gray">${esc(b.reason||'Bloqué')}</span></td><td>${fmtDate(b.start)}</td><td>${fmtDate(b.end)}</td><td>${_n!=='—'?_n+' nuit'+(_n>1?'s':''):'—'}</td><td><button class="action-btn danger" onclick="removeBlockedFromBookings(${b.id})">Supprimer</button></td></tr>`;}).join(''):'<tr><td colspan="5" style="color:var(--stone);padding:1rem 0">Aucune période bloquée</td></tr>';
+}
+function cancelBooking(ref){
+  if(!confirm('Annuler cette réservation ?'))return;
+  const bk=Store.getBookings();
+  const b=bk.find(x=>(x.ref||x.id)===ref);if(b)b.status='cancelled';
+  Store.save(Store.K.B,bk);broadcastSync();loadBookings();toast('Réservation annulée');
+}
+function removeBlockedFromBookings(id){
+  if(!confirm('Supprimer ce blocage ?'))return;
+  const cfg=Store.getConfig();cfg.blockedDates=(cfg.blockedDates||[]).filter(b=>b.id!==id);
+  Store.save(Store.K.C,cfg);broadcastSync();loadBookings();renderBlockedList(cfg.blockedDates);toast('Blocage supprimé');
+}
+// ── MODAL IMPRESSION ──
+function openPrintModal(title, htmlContent) {
+  document.getElementById('print-modal-title').textContent = title;
+  const iframe = document.getElementById('print-iframe');
+  iframe.srcdoc = htmlContent;
+  const modal = document.getElementById('print-modal');
+  modal.style.display = 'flex';
+}
+function closePrintModal() {
+  document.getElementById('print-modal').style.display = 'none';
+  document.getElementById('print-iframe').srcdoc = '';
+}
+function printModalDoc() {
+  const iframe = document.getElementById('print-iframe');
+  try {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+  } catch(e) {
+    // Fallback: open in new tab for printing
+    const blob = new Blob([iframe.srcdoc || ''], {type:'text/html'});
+    const url  = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    setTimeout(()=>URL.revokeObjectURL(url), 5000);
+  }
+}
+
+function viewBookingReceipt(ref){
+  const bk=Store.getBookings();
+  const b=bk.find(x=>(x.ref||x.id)===ref);
+  if(!b){toast('Réservation introuvable');return;}
+  const nom=b.name||(b.tenant?(b.tenant.prenom+' '+b.tenant.nom):'—');
+  const email=b.email||(b.tenant?b.tenant.email:'—');
+  const adresse=b.tenant?b.tenant.adresse:'—';
+  const arrive=b.arrive||(b.sejour?b.sejour.arrivee:'—');
+  const depart=b.depart||(b.sejour?b.sejour.depart:'—');
+  const nuits=b.nuits||(b.sejour?b.sejour.nuits:0);
+  const loyer=b.loyer||(b.finances?b.finances.loyer:0);
+  const saison=b.saison||(b.sejour?b.sejour.saison:'—');
+  const nf=v=>Number(v||0).toLocaleString('fr-FR',{minimumFractionDigits:2})+' €';
+  const cgvDate=b.cgv_date?new Date(b.cgv_date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}):'—';
+  const now=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Reçu ${b.ref}</title>
+  <style>body{font-family:Georgia,serif;max-width:750px;margin:2rem auto;color:#333;font-size:13px;line-height:1.7}
+  h1{font-size:22px;font-weight:normal;color:#C49553;border-bottom:2px solid #C49553;padding-bottom:.5rem}
+  table{width:100%;border-collapse:collapse;margin:.75rem 0}
+  td{padding:.4rem .6rem;border-bottom:1px solid #eee;font-size:12px}
+  th{padding:.4rem .6rem;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#888;font-weight:normal;border-bottom:1px solid #ddd;text-align:left}
+  .total{font-size:16px;font-weight:bold;color:#C49553}
+  .badge{background:#f0faf5;border-left:3px solid #4A7B68;padding:.4rem .6rem;font-size:11px;margin:.5rem 0}
+  @media print{body{margin:0}}</style></head><body>
+  <h1>Le Petit Virevent — Reçu de réservation</h1>
+  <p style="color:#888;font-size:11px">FCM INVESTISSEMENT · Siret 929 774 453 00013 · 49 Lotissement Clos des Cadenières, 84490 Cheval-Blanc</p>
+  <div style="display:flex;gap:2rem;margin:1rem 0">
+    <div><strong>Référence :</strong> ${b.ref||'—'}<br><strong>Date :</strong> ${now}</div>
+    <div><strong>Locataire :</strong> ${nom}<br><strong>Email :</strong> ${email}<br>${adresse?'<strong>Adresse :</strong> '+adresse:''}</div>
+  </div>
+  <table><thead><tr><th>Désignation</th><th>Qté</th><th>P.U.</th><th>Total</th></tr></thead><tbody>
+    <tr><td>Location saisonnière — ${fmtDate(arrive)} → ${fmtDate(depart)} · ${nuits} nuits · ${saison}</td><td>${nuits}</td><td>${nf(loyer/nuits)}</td><td>${nf(loyer)}</td></tr>
+    ${b.finances&&b.finances.menage>0?`<tr><td>Ménage intermédiaire</td><td>—</td><td>—</td><td>${nf(b.finances.menage)}</td></tr>`:''}
+    ${b.finances&&b.finances.piscine>0?`<tr><td>Nettoyage piscine</td><td>—</td><td>—</td><td>${nf(b.finances.piscine)}</td></tr>`:''}
+    ${b.finances&&b.finances.bebe>0?`<tr><td>Lit bébé parapluie</td><td>${nuits}</td><td>5,00 €</td><td>${nf(b.finances.bebe)}</td></tr>`:''}
+    <tr><td colspan="3" style="text-align:right;color:#888">Caution (remboursée J+7/10)</td><td>1 500,00 €</td></tr>
+    <tr><td colspan="3" style="text-align:right"><strong>Total TTC</strong></td><td class="total">${nf((b.finances?b.finances.total_ttc:loyer)||0)}</td></tr>
+  </tbody></table>
+  ${b.cgv_accepted?`<div class="badge">✓ CGV acceptées électroniquement le ${cgvDate} — Ref. signature : ${b.ref}</div>`:''}
+  <p style="font-size:11px;color:#888;margin-top:1rem">TVA non applicable — art. 293 B du CGI · Le solde est prélevé automatiquement 30 jours avant l'arrivée · Caution restituée sous 7-10 jours ouvrés après le départ</p>
+  </body></html>`;
+  openPrintModal(`Reçu · ${b.ref||nom}`, html);
+}
+
+
+// ── CONTACTS ──
+function loadContacts(){
+  const ct=Store.getContacts();
+  document.getElementById('contacts-tbody').innerHTML=ct.length?ct.map(c=>`<tr>
+    <td style="font-size:0.68rem;color:var(--stone)">${c.date}</td>
+    <td>${c.name}</td><td style="font-size:0.72rem">${c.email}</td>
+    <td><span class="badge gray">${c.subject||'—'}</span></td>
+    <td style="max-width:220px;font-size:0.72rem;color:var(--stone-light)">${(c.message||'').substring(0,80)}…</td>
+    <td><span class="badge ${c.read?'gray':'jade'}">${c.read?'Lu':'Nouveau'}</span></td>
+  </tr>`).join(''):'<tr><td colspan="6" style="color:var(--stone);padding:1.5rem 0">Aucun message</td></tr>';
+}
+
+// ── REVIEWS ──
+// ── AVIS — gestion complète ──
+function _getPendingReviews() {
+  try { return JSON.parse(localStorage.getItem('virevent_reviews_pending') || '[]'); } catch(e) { return []; }
+}
+function _savePendingReviews(list) {
+  try { localStorage.setItem('virevent_reviews_pending', JSON.stringify(list)); } catch(e) {}
+}
+
+function loadReviews() {
+  const rv  = Store.getReviews();
+  const cfg = Store.getConfig();
+  const sat = Store.getSatisfactionRate();
+  const pending = _getPendingReviews();
+
+  // Threshold
+  document.getElementById('review-threshold').value = cfg.reviewThreshold || 5;
+
+  // Gauge
+  document.getElementById('gauge-container').innerHTML = sat ? `
+    <div class="gauge-wrap">
+      <div class="gauge-circle">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(200,149,90,0.15)" stroke-width="6"/>
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#C8955A" stroke-width="6"
+            stroke-dasharray="${Math.round(2*Math.PI*34)}"
+            stroke-dashoffset="${Math.round(2*Math.PI*34*(1-sat.pct/100))}"
+            stroke-linecap="square" transform="rotate(-90 40 40)"/>
+        </svg>
+        <div class="gauge-pct">${sat.pct}%</div>
+      </div>
+      <div class="gauge-info">
+        <div class="gauge-title">Taux de satisfaction global</div>
+        <div class="gauge-val">${sat.avg} <span style="font-size:1rem;color:var(--stone)">/5</span></div>
+        <div class="gauge-sub">
+          Basé sur ${sat.count} avis ·
+          <span style="color:var(--jade-light)">${(rv.real||[]).length} publiés</span> ·
+          <span style="color:var(--stone)">${(rv.fictitious||[]).filter(f=>f.active).length} fictifs actifs</span>
+        </div>
+      </div>
+    </div>
+  ` : '<div class="gauge-wrap"><div style="font-size:.75rem;color:var(--stone)">Aucun avis actif pour le moment</div></div>';
+
+  // Pending moderation
+  const pendingEl = document.getElementById('pending-reviews');
+  const pendingCount = document.getElementById('pending-count');
+  if (pendingCount) pendingCount.textContent = pending.length ? `${pending.length} en attente` : '';
+  if (pendingEl) {
+    pendingEl.innerHTML = pending.length
+      ? pending.map((r, i) => `
+        <div class="review-pending ${r._selected ? 'selected' : ''}" id="prv_${i}">
+          <input type="checkbox" class="review-pending-cb" ${r._selected ? 'checked' : ''}
+            onchange="_togglePendingSelect(${i}, this.checked)">
+          <div class="review-pending-body">
+            <div class="review-pending-stars">
+              ${[1,2,3,4,5].map(s => `<div class="review-pending-star${s > r.note ? ' empty' : ''}"></div>`).join('')}
+            </div>
+            <div class="review-pending-meta">${esc(r.name)} · ${esc(r.origin||'')} · ${esc(r.date||'')}</div>
+            <div class="review-pending-text">"${esc(r.comment)}"</div>
+            ${(r.tags||[]).length ? `<div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.35rem">
+              ${r.tags.map(t=>`<span style="font-size:.48rem;padding:.1rem .35rem;border:.5px solid var(--border);color:var(--stone)">${esc(t)}</span>`).join('')}
+            </div>` : ''}
+          </div>
+          <button class="rv-unpublish-btn" onclick="_discardPending(${i})" title="Ignorer cet avis">✕</button>
+        </div>`).join('')
+      : '<div style="font-size:.72rem;color:var(--stone);padding:.5rem 0">Aucun avis en attente — ils apparaîtront ici quand des clients soumettront le formulaire de satisfaction.</div>';
+  }
+
+  // Published reviews
+  const real = rv.real || [];
+  document.getElementById('real-reviews').innerHTML = real.length
+    ? real.map(r => `
+      <div class="rv-published">
+        <div class="rv-published-body">
+          <div style="display:flex;gap:2px;margin-bottom:.2rem">
+            ${[1,2,3,4,5].map(s=>`<div class="${s<=r.note?'star-filled':'star-empty'}"></div>`).join('')}
+          </div>
+          <div class="review-name">${esc(r.name)} <span style="font-size:.52rem;color:var(--stone)">· ${esc(r.origin||'')} · ${esc(r.date||'')}</span></div>
+          <div class="review-text" style="margin:.25rem 0">"${esc(r.comment)}"</div>
+          <div class="review-tags">${(r.tags||[]).map(t=>`<span class="review-tag">${esc(t)}</span>`).join('')}</div>
+        </div>
+        <button class="rv-unpublish-btn" onclick="_unpublishReview('${r.id}')">Retirer</button>
+      </div>`).join('')
+    : '<div style="font-size:.72rem;color:var(--stone);padding:.5rem 0">Aucun avis publié pour l\'instant.</div>';
+
+  // Fictitious reviews
+  const fictitious = rv.fictitious || [];
+  document.getElementById('fictitious-reviews').innerHTML = fictitious.map(r => `
+    <div class="review-card" style="${r.active===false ? 'opacity:.4' : ''}">
+      <div class="review-stars">
+        ${[1,2,3,4,5].map(i=>`<div class="${i<=r.note?'star-filled':'star-empty'}"></div>`).join('')}
+      </div>
+      <div>
+        <div class="review-name">${esc(r.name)}<span class="fictif-badge">FICTIF</span></div>
+        <div class="review-meta">${esc(r.origin||'')} · ${esc(r.date||'')}</div>
+        <div class="review-text">"${esc(r.comment)}"</div>
+        <div class="review-tags">${(r.tags||[]).map(t=>`<span class="review-tag">${esc(t)}</span>`).join('')}</div>
+      </div>
+      <button class="toggle-btn" onclick="toggleFictitious('${r.id}')">
+        ${r.active !== false ? 'Désactiver' : 'Activer'}
+      </button>
+    </div>`).join('');
+}
+
+function _togglePendingSelect(i, checked) {
+  const list = _getPendingReviews();
+  if (list[i]) list[i]._selected = checked;
+  _savePendingReviews(list);
+  document.getElementById('prv_'+i)?.classList.toggle('selected', checked);
+}
+
+function _discardPending(i) {
+  if (!confirm('Ignorer définitivement cet avis ?')) return;
+  const list = _getPendingReviews();
+  list.splice(i, 1);
+  _savePendingReviews(list);
+  loadReviews();
+  toast('Avis ignoré');
+}
+
+function _unpublishReview(id) {
+  if (!confirm('Retirer cet avis du site ?')) return;
+  const rv = Store.getReviews();
+  rv.real = (rv.real || []).filter(r => r.id !== id);
+  Store.save(Store.K.R, rv);
+  broadcastSync();
+  loadReviews();
+  toast('Avis retiré du site');
+}
+
+function publishReviews() {
+  const pending = _getPendingReviews();
+  const selected = pending.filter(r => r._selected);
+  if (!selected.length) { toast('Cochez d\'abord les avis à publier'); return; }
+  const rv = Store.getReviews();
+  rv.real = rv.real || [];
+  selected.forEach(r => {
+    const clean = {
+      id: r.id || ('r_'+Date.now()+'_'+Math.random().toString(36).slice(2,7)),
+      name: r.name, origin: r.origin || '', date: r.date || '',
+      note: r.note || 5, comment: r.comment, tags: r.tags || [],
+      active: true
+    };
+    if (!rv.real.find(x => x.id === clean.id)) rv.real.unshift(clean);
+  });
+  Store.save(Store.K.R, rv);
+  broadcastSync();
+  // Remove published from pending
+  const remaining = pending.filter(r => !r._selected);
+  _savePendingReviews(remaining);
+  broadcastSync();
+  loadReviews();
+  toast(`${selected.length} avis publié${selected.length > 1 ? 's' : ''} sur le site ✓`);
+}
+
+function addManualReview() {
+  const name    = getVal('new-review-name').trim();
+  const comment = getVal('new-review-comment').trim();
+  if (!name || !comment) { toast('Nom et commentaire requis'); return; }
+  const rv = Store.getReviews();
+  rv.real = rv.real || [];
+  rv.real.unshift({
+    id: 'manual_'+Date.now(),
+    name,
+    origin:  getVal('new-review-origin').trim(),
+    date:    getVal('new-review-date').trim(),
+    note:    parseInt(getVal('new-review-note')) || 5,
+    comment,
+    tags:    getVal('new-review-tags').split(',').map(t=>t.trim()).filter(Boolean),
+    active:  true
+  });
+  Store.save(Store.K.R, rv);
+  broadcastSync();
+  // Clear form
+  ['new-review-name','new-review-origin','new-review-date','new-review-comment','new-review-tags'].forEach(id => setVal(id,''));
+  loadReviews();
+  toast('Avis ajouté et publié ✓');
+}
+
+function toggleFictitious(id) {
+  const rv = Store.getReviews();
+  const f = rv.fictitious.find(x => x.id === id);
+  if (f) f.active = f.active === false ? true : false;
+  Store.save(Store.K.R, rv);
+  broadcastSync();
+  loadReviews();
+}
+
+function saveThreshold() {
+  const cfg = Store.getConfig();
+  cfg.reviewThreshold = +getVal('review-threshold');
+  Store.save(Store.K.C, cfg);
+  toast('Seuil enregistré ✓');
+  loadReviews();
+}
+
+// ── SETTINGS ──
+function loadSettings(){
+  const cfg=Store.getConfig();
+  // Société
+  const co = (() => { try{ return JSON.parse(localStorage.getItem('virevent_company')||'null'); }catch(e){ return null; } })();
+  setVal('cfg-company-name',    co?.name    || cfg.companySociete || 'FCM INVESTISSEMENT');
+  setVal('cfg-company-siret',   co?.siret   || cfg.cgvSiret       || '929 774 453 00013');
+  setVal('cfg-company-address', co?.address || cfg.cgvAdresse     || '49 Lotissement Clos des Cadenières, 84490 Cheval-Blanc');
+  setVal('cfg-company-email',   co?.email   || cfg.email          || 'contact@lepetit-virevent.fr');
+  setVal('cfg-company-phone',   co?.phone   || cfg.companyPhone   || '');
+  // Admin
+  setVal('cfg-adminEmail',cfg.adminEmail);
+  setVal('cfg-reviewDelay',String(cfg.reviewDelay||3));
+  setVal('cfg-satisfVisible',String(cfg.satisfactionVisible!==false));
+  // Banque
+  setVal('cfg-bankName', cfg.bankName||'FCM INVESTISSEMENT');
+  setVal('cfg-bankBank', cfg.bankBank||'');
+  setVal('cfg-bankIban', cfg.bankIban||'');
+  setVal('cfg-bankBic',  cfg.bankBic||'');
+  setVal('cfg-bankRef',  cfg.bankRef||'REF VIR + N° réservation');
+  // Paiement
+  setVal('cfg-payProvider', cfg.payProvider||'stripe');
+  setVal('cfg-payUrl', cfg.payUrl||'');
+  setVal('cfg-payLabel', cfg.payLabel||'Payer la caution (1 500 €)');
+  updatePayProviderHint();
+  const testZone = document.getElementById('pay-test-zone');
+  const testLink = document.getElementById('pay-test-link');
+  if(cfg.payUrl && testZone && testLink){
+    testZone.style.display='block';
+    testLink.href=cfg.payUrl; testLink.textContent=cfg.payUrl;
+  }
+}
+
+function updatePayProviderHint(){
+  const p = document.getElementById('cfg-payProvider')?.value||'stripe';
+  const hints = {
+    stripe:'(Stripe Payment Link — buy.stripe.com/…)',
+    sumup:'(SumUp — lien de paiement checkout)',
+    paypal:'(PayPal — paypal.me/… ou lien de bouton)',
+    autre:'(URL de votre page de paiement)'
+  };
+  const el = document.getElementById('pay-provider-hint');
+  if(el) el.textContent = hints[p]||'';
+}
+
+function saveSettings(){
+  const cfg=Store.getConfig();
+  // Société
+  const company = {
+    name:    getVal('cfg-company-name').trim()    || 'FCM INVESTISSEMENT',
+    siret:   getVal('cfg-company-siret').trim()   || '929 774 453 00013',
+    address: getVal('cfg-company-address').trim() || '49 Lotissement Clos des Cadenières, 84490 Cheval-Blanc',
+    email:   getVal('cfg-company-email').trim()   || 'contact@lepetit-virevent.fr',
+    phone:   getVal('cfg-company-phone').trim(),
+  };
+  try{ localStorage.setItem('virevent_company', JSON.stringify(company)); }catch(e){}
+  cfg.companySociete = company.name;
+  cfg.cgvSiret       = company.siret;
+  cfg.cgvAdresse     = company.address;
+  cfg.email          = company.email;
+  cfg.companyPhone   = company.phone;
+  // Sync also to cgv fields if cgv page already has saved data
+  try{
+    const cgvData = JSON.parse(localStorage.getItem('virevent_cgv')||'null');
+    if(cgvData){ cgvData.societe=company.name; cgvData.siret=company.siret; cgvData.adresse=company.address; cgvData.email=company.email; localStorage.setItem('virevent_cgv',JSON.stringify(cgvData)); }
+  }catch(e){}
+  // Sync bank titulaire if not manually set
+  if(!getVal('cfg-bankName')) setVal('cfg-bankName', company.name);
+  cfg.adminEmail=getVal('cfg-adminEmail');
+  cfg.reviewDelay=+getVal('cfg-reviewDelay');
+  cfg.satisfactionVisible=getVal('cfg-satisfVisible')==='true';
+  const newPwd=getVal('cfg-adminPwd');
+  if(newPwd) cfg.adminPassword=newPwd;
+  // Banque
+  cfg.bankName = getVal('cfg-bankName').trim();
+  cfg.bankBank = getVal('cfg-bankBank').trim();
+  cfg.bankIban = getVal('cfg-bankIban').trim();
+  cfg.bankBic  = getVal('cfg-bankBic').trim();
+  cfg.bankRef  = getVal('cfg-bankRef').trim();
+  try{ localStorage.setItem('virevent_bank', JSON.stringify({name:cfg.bankName,bank:cfg.bankBank,iban:cfg.bankIban,bic:cfg.bankBic,ref:cfg.bankRef})); }catch(e){}
+  // Paiement
+  const payUrl = getVal('cfg-payUrl').trim();
+  cfg.payProvider = getVal('cfg-payProvider');
+  cfg.payUrl = payUrl;
+  cfg.payLabel = getVal('cfg-payLabel').trim()||'Payer la caution (1 500 €)';
+  // Écrire aussi en localStorage direct pour le site public
+  try{
+    localStorage.setItem('virevent_pay_url', payUrl);
+    localStorage.setItem('virevent_pay_label', cfg.payLabel);
+  }catch(e){}
+  Store.save(Store.K.C,cfg);
+  // Mettre à jour la zone de test
+  const testZone = document.getElementById('pay-test-zone');
+  const testLink = document.getElementById('pay-test-link');
+  if(testZone && testLink && payUrl){
+    testZone.style.display='block';
+    testLink.href=payUrl; testLink.textContent=payUrl;
+  }
+  broadcastSync();
+  toast('Paramètres enregistrés ✓');
+}
+
+function exportData(){
+  const data={config:Store.getConfig(),bookings:Store.getBookings(),reviews:Store.getReviews(),contacts:Store.getContacts()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='virevent-data.json';a.click();
+}
+function resetData(){
+  [Store.K.C,Store.K.B,Store.K.R,Store.K.CT].forEach(k=>localStorage.removeItem(k));
+  Store.init();location.reload();
+}
+
+// ── CGV ──
+const CGV_DEFAULT = `<h3>Art. 1 — Objet</h3>
+<p>Les présentes Conditions Générales de Vente régissent la location saisonnière du bien immobilier dénommé « Le Petit Virevent », situé à Bonnieux (84480), Vaucluse, France. Toute réservation implique l'acceptation pleine et entière des présentes CGV, sans réserve.</p>
+
+<h3>Art. 2 — Réservation et confirmation</h3>
+<p>La réservation est ferme à compter du paiement de la caution de garantie de <strong>1 500 €</strong>. Un reçu électronique et une référence de réservation sont envoyés au locataire. L'acceptation des CGV lors du processus de réservation vaut signature électronique et constitue une preuve contractuelle opposable en cas de litige.</p>
+
+<h3>Art. 3 — Durée et prise d'effet</h3>
+<p>La location s'effectue du samedi au samedi, pour une durée minimum de 7 nuits. Les arrivées et départs s'effectuent aux horaires convenus avec le propriétaire. Toute la période est due intégralement.</p>
+
+<h3>Art. 4 — Prix et modalités de paiement</h3>
+<p>Le tarif est exprimé en euros TTC par nuit. La <strong>caution de 1 500 €</strong> est prélevée immédiatement à la réservation. Le <strong>solde du loyer</strong> est prélevé automatiquement <strong>30 jours avant la date d'arrivée</strong> et est non remboursable passé ce délai.</p>
+
+<h3>Art. 5 — Caution et état des lieux</h3>
+<p>La caution de 1 500 € est restituée dans un délai de <strong>7 à 10 jours ouvrés</strong> suivant la date de départ, sous réserve d'un état des lieux de sortie conforme. Toute dégradation constatée sera déduite de la caution, voire facturée au-delà de son montant.</p>
+
+<h3>Art. 6 — Annulation par le Locataire</h3>
+<p>Toute annulation doit être notifiée par email. Conditions :</p>
+<p>• Annulation &gt; 60 jours : caution remboursée intégralement<br>• Annulation entre 30 et 60 jours : 50 % de la caution retenue<br>• Annulation &lt; 30 jours ou no-show : caution et loyer non remboursables</p>
+
+<h3>Art. 7 — Obligations du Locataire</h3>
+<p>Le locataire s'engage à occuper le logement en bon état, respecter le nombre maximum de 8 personnes, ne pas fumer à l'intérieur, ne pas organiser de manifestations non déclarées, respecter le voisinage, et restituer le logement dans l'état d'origine.</p>
+
+<h3>Art. 8 — Services optionnels</h3>
+<p>Les services complémentaires (ménage, nettoyage piscine, lit bébé) sont facturés aux tarifs indiqués à la réservation. Le lit bébé parapluie est fourni propre ; son usage se fait sous la responsabilité exclusive du locataire.</p>
+
+<h3>Art. 9 — Responsabilité</h3>
+<p>FCM INVESTISSEMENT ne saurait être tenu responsable des dommages corporels ou matériels. L'accès à la piscine se fait sous la surveillance et responsabilité exclusive du locataire. Les enfants ne doivent jamais être laissés sans surveillance.</p>
+
+<h3>Art. 10 — Protection des données (RGPD)</h3>
+<p>Les données collectées sont utilisées exclusivement dans le cadre de la location, sans transmission à des tiers. Droit d'accès, rectification et suppression : <strong>{{email}}</strong>.</p>
+
+<h3>Art. 11 — Litiges et juridiction</h3>
+<p>Les présentes CGV sont soumises au droit français. En cas de litige, le Tribunal judiciaire d'Apt (Vaucluse) sera seul compétent.</p>`;
+
+// ── CONVERSION TEXTE BRUT → HTML pour les CGV ──
+function textToHTML(raw) {
+  const lines = raw.split(/\r?\n/);
+  let html = '';
+  let inList = false;
+
+  const closeList = () => { if (inList) { html += '</ul>\n'; inList = false; } };
+
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      closeList();
+      return; // blank line = paragraph break (handled by adjacent <p> tags)
+    }
+
+    // Titre niveau 1 : tout en majuscules, ou ligne commençant par # ou ARTICLE
+    if (/^#{1,2}\s/.test(trimmed)) {
+      closeList();
+      html += `<h3>${trimmed.replace(/^#{1,2}\s+/, '')}</h3>\n`;
+      return;
+    }
+    if (/^#{3,}\s/.test(trimmed)) {
+      closeList();
+      html += `<h4>${trimmed.replace(/^#{3,}\s+/, '')}</h4>\n`;
+      return;
+    }
+    // Ligne en MAJUSCULES ou "Art." ou "Article" → h3
+    if (/^(ART\.|ARTICLE\s+\d|[A-Z\s\d]{10,}$)/.test(trimmed) && !/[àâäéèêëîïôùûü]/.test(trimmed)) {
+      closeList();
+      html += `<h3>${trimmed}</h3>\n`;
+      return;
+    }
+    // Titre numéroté : "1. Titre" ou "1 - Titre"
+    if (/^\d+[\.\-–]\s+[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜ]/.test(trimmed)) {
+      closeList();
+      html += `<h3>${trimmed}</h3>\n`;
+      return;
+    }
+    // Sous-titre : "1.1" ou "a)" ou "•" bullet
+    if (/^(\d+\.\d+|[a-zA-Z]\))\s/.test(trimmed)) {
+      closeList();
+      html += `<h4>${trimmed}</h4>\n`;
+      return;
+    }
+    // Liste : ligne commençant par - ou • ou *
+    if (/^[-•*]\s/.test(trimmed)) {
+      if (!inList) { html += '<ul>\n'; inList = true; }
+      html += `<li>${trimmed.replace(/^[-•*]\s+/, '')}</li>\n`;
+      return;
+    }
+    // Ligne "—" ou "---" = séparateur
+    if (/^[-—]{3,}$/.test(trimmed)) {
+      closeList();
+      html += '<hr>\n';
+      return;
+    }
+    // Paragraphe normal
+    closeList();
+    // Bold: **text** → <strong>text</strong>
+    const formatted = trimmed
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    html += `<p>${formatted}</p>\n`;
+  });
+
+  closeList();
+  return html.trim();
+}
+
+function importCGVFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const nameEl = document.getElementById('cgv-file-name');
+  if (nameEl) nameEl.textContent = file.name;
+
+  if (typeof mammoth === 'undefined') {
+    toast('Bibliothèque Word non chargée — vérifiez votre connexion internet.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const arrayBuffer = e.target.result;
+    mammoth.convertToHtml({ arrayBuffer: arrayBuffer }, {
+      styleMap: [
+        "p[style-name='Heading 1'] => h3:fresh",
+        "p[style-name='Heading 2'] => h3:fresh",
+        "p[style-name='Heading 3'] => h4:fresh",
+        "p[style-name='Title']     => h2:fresh",
+      ]
+    }).then(function(result) {
+      let html = result.value;
+      // Nettoyer les balises vides
+      html = html.replace(/<p><\/p>/g, '').replace(/<p>\s*<\/p>/g, '');
+      html = html.replace(/\n{3,}/g, '\n\n').trim();
+      document.getElementById('cgv-text').value = html;
+      // Auto-publier immédiatement après import
+      saveCGV();
+      toast('Fichier Word importé et publié sur le site ✓');
+    }).catch(function(err) {
+      toast('Erreur de conversion : ' + err.message);
+    });
+  };
+  reader.onerror = () => toast('Impossible de lire le fichier.');
+  reader.readAsArrayBuffer(file);
+  input.value = '';
+}
+
+function loadCGV(){
+  try {
+    const saved = JSON.parse(localStorage.getItem('virevent_cgv')||'null');
+    const cfg = Store.getConfig();
+    const co  = (() => { try{ return JSON.parse(localStorage.getItem('virevent_company')||'null'); }catch(e){ return null; } })();
+    const defSociete = co?.name    || cfg.companySociete || cfg.cgvSociete || 'FCM INVESTISSEMENT';
+    const defSiret   = co?.siret   || cfg.cgvSiret       || '929 774 453 00013';
+    const defAdresse = co?.address || cfg.cgvAdresse     || '49 Lotissement Clos des Cadenières, 84490 Cheval-Blanc';
+    const defEmail   = co?.email   || cfg.email          || 'contact@lepetit-virevent.fr';
+    document.getElementById('cgv-societe').value = saved ? (saved.societe||defSociete) : defSociete;
+    document.getElementById('cgv-siret').value   = saved ? (saved.siret||defSiret) : defSiret;
+    document.getElementById('cgv-adresse').value = saved ? (saved.adresse||defAdresse) : defAdresse;
+    document.getElementById('cgv-email').value   = saved ? (saved.email||defEmail) : defEmail;
+    document.getElementById('cgv-text').value    = saved ? (saved.text||CGV_DEFAULT) : CGV_DEFAULT;
+    if(saved && saved.date){
+      document.getElementById('cgv-meta').innerHTML =
+        `Dernière publication : <strong style="color:var(--cream)">${new Date(saved.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}</strong> à ${new Date(saved.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`;
+    }
+  } catch(e){}
+}
+
+function loadDefaultCGV(){
+  if(!confirm('Réinitialiser le texte au modèle par défaut ?')) return;
+  document.getElementById('cgv-text').value = CGV_DEFAULT;
+  toast('Texte réinitialisé — pensez à publier');
+}
+
+function saveCGV(){
+  const societe = document.getElementById('cgv-societe').value.trim();
+  const siret   = document.getElementById('cgv-siret').value.trim();
+  const adresse = document.getElementById('cgv-adresse').value.trim();
+  const email   = document.getElementById('cgv-email').value.trim();
+  let   text    = document.getElementById('cgv-text').value;
+
+  // Injecter les variables dans le texte
+  text = text.replace(/\{\{societe\}\}/g, societe)
+             .replace(/\{\{siret\}\}/g,   siret)
+             .replace(/\{\{adresse\}\}/g, adresse)
+             .replace(/\{\{email\}\}/g,   email);
+
+  const cgvData = { societe, siret, adresse, email, text, date: new Date().toISOString() };
+  try {
+    localStorage.setItem('virevent_cgv', JSON.stringify(cgvData));
+  } catch(e) {}
+
+  // Mettre à jour aussi la config admin
+  const cfg = Store.getConfig();
+  cfg.cgvSociete = societe; cfg.cgvSiret = siret;
+  cfg.cgvAdresse = adresse; cfg.cgvEmail = email;
+  Store.save(Store.K.C, cfg);
+  broadcastSync();
+
+  document.getElementById('cgv-meta').innerHTML =
+    `Dernière publication : <strong style="color:var(--cream)">${new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}</strong> à ${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`;
+  toast('CGV publiées — visibles sur le site ✓');
+}
+
+function previewCGV(){
+  const societe = document.getElementById('cgv-societe').value;
+  const siret   = document.getElementById('cgv-siret').value;
+  const adresse = document.getElementById('cgv-adresse').value;
+  const email   = document.getElementById('cgv-email').value;
+  let text      = document.getElementById('cgv-text').value;
+  text = text.replace(/\{\{societe\}\}/g,societe).replace(/\{\{siret\}\}/g,siret)
+             .replace(/\{\{adresse\}\}/g,adresse).replace(/\{\{email\}\}/g,email);
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Aperçu CGV</title>
+  <style>body{font-family:Georgia,serif;max-width:780px;margin:2rem auto;line-height:1.75;color:#333;font-size:14px}
+  h1{font-size:22px;font-weight:normal;color:#C49553;border-bottom:2px solid #C49553;padding-bottom:.5rem;margin-bottom:1.5rem}
+  h3{font-size:15px;margin:1.2rem 0 .4rem;color:#222}
+  strong{color:#C49553}p{margin-bottom:.6rem}</style></head><body>
+  <h1>Conditions Générales de Vente — Le Petit Virevent</h1>
+  <p style="color:#888;font-size:12px">${societe} · Siret ${siret} · ${adresse}</p>
+  ${text}
+  <p style="margin-top:2rem;font-size:11px;color:#aaa;border-top:1px solid #eee;padding-top:.75rem">Aperçu administrateur</p>
+  </body></html>`;
+  openPrintModal('Aperçu CGV', html);
+}
+
+
+
+function viewBookingInvoice(ref) {
+  const bk = Store.getBookings();
+  const b = bk.find(x => (x.ref||x.id) === ref);
+  if (!b) { toast('Réservation introuvable'); return; }
+  const inv = b.invoice || {};
+  const billing = b.billing || b.tenant || {};
+  const fmtD = s => { if(!s)return'—'; try{return new Date(s).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}catch{return s} };
+  const nf = v => Number(v||0).toLocaleString('fr-FR',{minimumFractionDigits:2})+' €';
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Facture ${inv.num||'—'}</title>
+  <style>body{font-family:Georgia,serif;max-width:780px;margin:2rem auto;color:#333;font-size:13px;line-height:1.7}
+  h1{font-size:22px;font-weight:normal;color:#C49553;border-bottom:2px solid #C49553;padding-bottom:.5rem;margin-bottom:1rem}
+  table{width:100%;border-collapse:collapse;margin:.75rem 0}
+  td{padding:.4rem .6rem;border-bottom:1px solid #eee;font-size:12px}
+  th{padding:.4rem .6rem;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#888;font-weight:normal;border-bottom:1px solid #ddd;text-align:left}
+  .gold{color:#C49553;font-size:15px;font-weight:bold}.note{background:#f0faf5;border-left:3px solid #4A7B68;padding:.4rem .6rem;font-size:11px;margin:.5rem 0}
+  @media print{body{margin:0}}
+/* ── Champs textes admin ── */
+.txt-field {
+  width: 100%; background: var(--bg3);
+  color: var(--cream); font-family: 'DM Sans', sans-serif;
+  font-size: .72rem; padding: .35rem .5rem;
+  outline: none; box-sizing: border-box;
+}
+.txt-field-fr { border: .5px solid rgba(196,149,83,.2); }
+.txt-field-fr:focus { border-color: rgba(196,149,83,.6); }
+.txt-field-en { border: .5px solid rgba(74,160,114,.2); }
+.txt-field-en:focus { border-color: rgba(74,160,114,.6); }
+</style></head><body>
+  <h1>Le Petit Virevent — FACTURE</h1>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin:1rem 0;font-size:12px">
+    <div><strong>FCM INVESTISSEMENT</strong><br>49 Lotissement Clos des Cadenières<br>84490 Cheval-Blanc, France<br>Siret : 929 774 453 00013<br><em>TVA non applicable — art. 293 B CGI</em></div>
+    <div style="text-align:right"><strong>N° ${inv.num||'—'}</strong><br>Émise le ${fmtD(inv.date_emission)}<br><strong>Date de débit : ${fmtD(inv.date_debit)}</strong><br>Réf. : ${b.ref||'—'}</div>
+  </div>
+  <div style="margin:1rem 0;padding:.75rem;background:#f9f7f4;border:1px solid #eee;font-size:12px">
+    <strong>Facturé à :</strong><br>
+    ${billing.prenom||''} ${billing.nom||''}<br>
+    ${(billing.adresse||'').replace(/\n/g,'<br>')}<br>
+    ${billing.email||''}
+    ${inv.billing_modified?'<br><em style="font-size:11px;color:#888;font-style:italic">Coordonnées modifiées le '+fmtD(inv.billing_modified)+'</em>':''}
+  </div>
+  <table><thead><tr><th>Désignation</th><th style="text-align:right">Qté</th><th style="text-align:right">P.U. HT</th><th style="text-align:right">TVA</th><th style="text-align:right">Total TTC</th></tr></thead>
+  <tbody>
+    <tr><td>Location saisonnière — Le Petit Virevent, Bonnieux (84480)<br><small style="color:#888">${fmtD(b.sejour?.arrivee)} → ${fmtD(b.sejour?.depart)} · ${b.sejour?.nuits||0} nuits · ${b.sejour?.saison||''}</small></td>
+    <td style="text-align:right">${b.sejour?.nuits||0}</td>
+    <td style="text-align:right">${nf((inv.finances.loyer||0)/(b.sejour?.nuits||1))}</td>
+    <td style="text-align:right">N/A</td>
+    <td style="text-align:right">${nf(inv.finances.loyer||0)}</td></tr>
+    ${(inv.finances.menage||0)>0?`<tr><td>Ménage intermédiaire</td><td style="text-align:right">—</td><td style="text-align:right">—</td><td style="text-align:right">N/A</td><td style="text-align:right">${nf(inv.finances.menage)}</td></tr>`:''}
+    ${(inv.finances.piscine||0)>0?`<tr><td>Nettoyage piscine</td><td style="text-align:right">—</td><td style="text-align:right">—</td><td style="text-align:right">N/A</td><td style="text-align:right">${nf(inv.finances.piscine)}</td></tr>`:''}
+    ${(inv.finances.bebe||0)>0?`<tr><td>Lit bébé parapluie</td><td style="text-align:right">${b.sejour?.nuits||0}</td><td style="text-align:right">5,00 €</td><td style="text-align:right">N/A</td><td style="text-align:right">${nf(inv.finances.bebe)}</td></tr>`:''}
+    <tr style="border-top:2px solid #C49553"><td colspan="4" style="text-align:right"><strong>Total TTC</strong></td><td style="text-align:right" class="gold">${nf(inv.finances.total_ttc||0)}</td></tr>
+    <tr><td colspan="4" style="text-align:right;color:#888;font-size:11px">Acompte versé (caution de garantie)</td><td style="text-align:right;color:#888;font-size:11px">− ${nf(inv.finances.caution||1500)}</td></tr>
+    <tr><td colspan="4" style="text-align:right"><strong>Solde à régler (débité le ${fmtD(inv.date_debit)})</strong></td><td style="text-align:right"><strong>${nf(inv.finances.solde||0)}</strong></td></tr>
+  </tbody></table>
+  ${b.cgv_accepted?`<div class="note">✓ CGV acceptées électroniquement le ${fmtD(b.cgv_date)} — Référence : ${b.ref||'—'}</div>`:''}
+  <p style="font-size:11px;color:#888;margin-top:1rem;border-top:1px solid #eee;padding-top:.75rem">TVA non applicable en vertu de l'art. 293 B du CGI · La caution est restituée sous 7 à 10 jours ouvrés après le départ</p>
+  </body></html>`;
+  openPrintModal(`Facture · ${inv.num||b.ref||"—"}`, html);
+}
+
+function printInvoiceFromAdmin(ref){
+  const modal=document.getElementById('billing-edit-modal');
+  if(modal) modal.style.display='none';
+  setTimeout(()=>viewBookingInvoice(ref),150);
+}
+
+function getVal(id){const el=document.getElementById(id);return el?el.value:'';}
+function setVal(id,v){const el=document.getElementById(id);if(el)el.value=v??'';}
+function fmtDate(s){if(!s)return'—';try{return new Date(s).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'})}catch{return s}}
+</script>
+<script id="site-sections-data" type="application/json">
+[{"id": "nav", "label": "Navigation", "fields": [{"key": "nav.avis", "label": "Menu - Avis", "fr": "Avis", "en": "Reviews", "long": false}, {"key": "nav.contact", "label": "Menu - Contact", "fr": "Contact", "en": "Contact", "long": false}, {"key": "nav.cta", "label": "Bouton Réserver", "fr": "Réserver", "en": "Book", "long": false}, {"key": "nav.dispo", "label": "Menu - Disponibilités", "fr": "Disponibilités", "en": "Availability", "long": false}, {"key": "nav.gallery", "label": "Menu - Photos", "fr": "Photos", "en": "Gallery", "long": false}, {"key": "nav.tarifs", "label": "Menu - Tarifs", "fr": "Tarifs", "en": "Rates", "long": false}, {"key": "nav.villa", "label": "Menu - La villa", "fr": "La villa", "en": "The villa", "long": false}]}, {"id": "hero", "label": "Hero - bannière principale", "fields": [{"key": "hero.cta1", "label": "Bouton 1", "fr": "Vérifier les disponibilités", "en": "Check availability", "long": false}, {"key": "hero.cta2", "label": "Bouton 2", "fr": "Découvrir la villa", "en": "Discover the villa", "long": false}, {"key": "hero.cta3", "label": "Bouton 3", "fr": "Galerie photos →", "en": "Photo gallery →", "long": false}, {"key": "hero.eyebrow", "label": "Tag au-dessus du titre", "fr": "Location saisonnière · Luberon · Vaucluse", "en": "Holiday rental · Luberon · Vaucluse", "long": false}, {"key": "hero.scroll", "label": "Texte scroll", "fr": "Découvrir", "en": "Discover", "long": false}, {"key": "hero.sub", "label": "Sous-titre", "fr": "Bali rencontre la Provence · Bonnieux", "en": "Bali meets Provence · Bonnieux", "long": false}]}, {"id": "gallery", "label": "Galerie photos", "fields": [{"key": "gallery.more", "label": "Bouton voir plus", "fr": "Voir toutes les photos →", "en": "View all photos →", "long": false}, {"key": "gallery.p1", "label": "Photo 1", "fr": "Façade sud & piscine", "en": "South façade & pool", "long": false}, {"key": "gallery.p2", "label": "Photo 2", "fr": "Suite principale", "en": "Master suite", "long": false}, {"key": "gallery.p3", "label": "Photo 3", "fr": "Salon ouvert", "en": "Open living room", "long": false}, {"key": "gallery.p4", "label": "Photo 4", "fr": "Terrasse & bali-beds", "en": "Terrace & bali-beds", "long": false}, {"key": "gallery.p5", "label": "Photo 5", "fr": "Vue Luberon", "en": "Luberon view", "long": false}, {"key": "gallery.photos", "label": "Format compteur", "fr": "{n} photo{s}", "en": "{n} photo{s}", "long": false}, {"key": "gallery.tag", "label": "Tag section", "fr": "La villa en images", "en": "The villa in pictures", "long": false}, {"key": "gallery.title", "label": "Titre section", "fr": "Découvrez <em>chaque espace</em>", "en": "Discover <em>every space</em>", "long": false}]}, {"id": "villa", "label": "Section Villa", "fields": [{"key": "villa.a1", "label": "Équipement 1", "fr": "Piscine 4 × 4 m", "en": "Swimming pool 4 × 4 m", "long": false}, {"key": "villa.a10", "label": "Équipement 10", "fr": "Chambre 3", "en": "Bedroom 3", "long": false}, {"key": "villa.a2", "label": "Équipement 2", "fr": "Climatisation", "en": "Air conditioning", "long": false}, {"key": "villa.a3", "label": "Équipement 3", "fr": "Jardin 900 m²", "en": "Garden 900 m²", "long": false}, {"key": "villa.a4", "label": "Équipement 4", "fr": "Wi-Fi haut débit", "en": "High-speed Wi-Fi", "long": false}, {"key": "villa.a5", "label": "Équipement 5", "fr": "Cuisine ouverte", "en": "Open kitchen", "long": false}, {"key": "villa.a6", "label": "Équipement 6", "fr": "Terrain de boule", "en": "Pétanque court", "long": false}, {"key": "villa.a7", "label": "Équipement 7", "fr": "Canapé double convertible", "en": "Double sofa bed", "long": false}, {"key": "villa.a8", "label": "Équipement 8", "fr": "Chambre 1", "en": "Bedroom 1", "long": false}, {"key": "villa.a9", "label": "Équipement 9", "fr": "Chambre 2", "en": "Bedroom 2", "long": false}, {"key": "villa.from", "label": "Mention prix nuit", "fr": "/ nuit · basse saison", "en": "/ night · low season", "long": false}, {"key": "villa.photo", "label": "Légende photo", "fr": "Photo de la villa", "en": "Villa photo", "long": false}, {"key": "villa.tag", "label": "Tag", "fr": "La villa", "en": "The villa", "long": false}, {"key": "villa.text", "label": "Texte descriptif", "fr": "280 m² de pierre dorée du Luberon, conçue dans l'esprit des mas balinais ouverts sur la nature. Cinq chambres en suite, un salon sans mur côté jardin, une piscine à débordement face au massif du Luberon et un jardin de 2 800 m² planté d'oliviers centenaires.", "en": "280 m² of golden Luberon stone, designed in the spirit of open Balinese farmhouses. Five en-suite bedrooms, a living room open to the garden, an infinity pool facing the Luberon massif, and a 2,800 m² garden of century-old olive trees.", "long": true}, {"key": "villa.title", "label": "Titre", "fr": "Espace, lumière<br>& <em>caractère</em>", "en": "Space, light<br>& <em>character</em>", "long": false}]}, {"id": "tarifs", "label": "Section Tarifs", "fields": [{"key": "tarifs.guests", "label": "Chambres et personnes (toutes cartes)", "fr": "5 chambres · 10 personnes", "en": "5 bedrooms · 10 guests", "long": false}, {"key": "tarifs.high.badge", "label": "Haute saison — badge", "fr": "Haute saison", "en": "Peak season", "long": false}, {"key": "tarifs.high.clean", "label": "Haute saison — item 3 (ex: Ménage inclus)", "fr": "Ménage inclus", "en": "Cleaning included", "long": false}, {"key": "tarifs.high.season", "label": "Haute saison — période", "fr": "Juillet → Août", "en": "July → August", "long": false}, {"key": "tarifs.low.arr", "label": "Basse saison — item 3 (jours arrivée)", "fr": "Samedi → Samedi", "en": "Saturday → Saturday", "long": false}, {"key": "tarifs.low.min", "label": "Basse saison — item 2 (durée min.)", "fr": "Minimum 1 semaine", "en": "Minimum 1 week", "long": false}, {"key": "tarifs.low.season", "label": "Basse saison — période", "fr": "Basse saison · Nov → Mars", "en": "Low season · Nov → Mar", "long": false}, {"key": "tarifs.mid.arr", "label": "Mi-saison — item 3 (jours arrivée)", "fr": "Samedi → Samedi", "en": "Saturday → Saturday", "long": false}, {"key": "tarifs.mid.season", "label": "Mi-saison — période", "fr": "Mi-saison · Avr–Mai · Sep–Oct", "en": "Mid season · Apr–May · Sep–Oct", "long": false}, {"key": "tarifs.note", "label": "Note bas de page", "fr": "Soit 1 900 € / sem. en basse · 2 700 € / sem. en mi-saison · 3 800 € / sem. en haute saison · Caution 1 500 € débitée à la réservation · Remboursée J+7/10", "en": "i.e. €1,900 / week low · €2,700 / week mid · €3,800 / week peak · Security deposit €1,500 charged at booking · Refunded D+7/10", "long": true}, {"key": "tarifs.perweek", "label": "Unité prix (€ / nuit)", "fr": "€ / nuit", "en": "€ / night", "long": false}, {"key": "tarifs.satsat", "label": "Samedi → Samedi (haute & mi-saison)", "fr": "Samedi → Samedi", "en": "Saturday → Saturday", "long": false}, {"key": "tarifs.tag", "label": "Tag section", "fr": "Tarifs & séjours", "en": "Rates & stays", "long": false}, {"key": "tarifs.title", "label": "Titre section", "fr": "Choisissez <em>votre saison</em>", "en": "Choose <em>your season</em>", "long": false}, {"key": "tarifs.xmas.badge", "label": "Noël & Nouvel An — badge", "fr": "Noël & Nouvel An", "en": "Christmas & New Year", "long": false}, {"key": "tarifs.xmas.season", "label": "Noël & Nouvel An — période", "fr": "24 déc. → 2 jan.", "en": "24 Dec. → 2 Jan.", "long": false}, {"key": "tarifs.xmas.min", "label": "Noël & Nouvel An — item 2 (durée min.)", "fr": "Minimum 1 semaine", "en": "Minimum 1 week", "long": false}, {"key": "tarifs.xmas.arr", "label": "Noël & Nouvel An — item 3 (jours arrivée)", "fr": "Samedi → Samedi", "en": "Saturday → Saturday", "long": false}, {"key": "tarifs.easter.badge", "label": "Pâques — badge", "fr": "Vacances de Pâques", "en": "Easter Holidays", "long": false}, {"key": "tarifs.easter.season", "label": "Pâques — période", "fr": "Selon calendrier scolaire", "en": "School holiday calendar", "long": false}, {"key": "tarifs.easter.min", "label": "Pâques — item 2 (durée min.)", "fr": "Minimum 1 semaine", "en": "Minimum 1 week", "long": false}, {"key": "tarifs.easter.arr", "label": "Pâques — item 3 (jours arrivée)", "fr": "Samedi → Samedi", "en": "Saturday → Saturday", "long": false}, {"key": "tarifs.low.badge", "label": "Basse saison — badge", "fr": "Basse saison", "en": "Low season", "long": false}, {"key": "tarifs.mid.badge", "label": "Mi-saison — badge", "fr": "Mi-saison", "en": "Mid season", "long": false}, {"key": "tarifs.low.item4", "label": "Basse saison — item 4 (optionnel)", "fr": "", "en": "", "long": false}, {"key": "tarifs.high.item4", "label": "Haute saison — item 4 (optionnel)", "fr": "", "en": "", "long": false}, {"key": "tarifs.mid.item4", "label": "Mi-saison — item 4 (optionnel)", "fr": "", "en": "", "long": false}, {"key": "tarifs.xmas.item4", "label": "Noël & Nouvel An — item 4 (optionnel)", "fr": "", "en": "", "long": false}, {"key": "tarifs.easter.item4", "label": "Pâques — item 4 (optionnel)", "fr": "", "en": "", "long": false}]}, {"id": "cal", "label": "Calendrier", "fields": [{"key": "cal.arr", "label": "Arrivée", "fr": "Arrivée", "en": "Arrival", "long": false}, {"key": "cal.continue", "label": "Bouton continuer", "fr": "Continuer →", "en": "Continue →", "long": false}, {"key": "cal.dep", "label": "Départ", "fr": "Départ", "en": "Departure", "long": false}, {"key": "cal.leg.avail", "label": "cal.leg.avail", "fr": "Samedi disponible — cliquez pour choisir", "en": "Available Saturday — click to select", "long": false}, {"key": "cal.leg.bk", "label": "cal.leg.bk", "fr": "Samedi réservé (non disponible)", "en": "Saturday booked (unavailable)", "long": false}, {"key": "cal.leg.range", "label": "cal.leg.range", "fr": "Période choisie", "en": "Selected period", "long": false}, {"key": "cal.leg.sel", "label": "cal.leg.sel", "fr": "Votre sélection", "en": "Your selection", "long": false}, {"key": "cal.sub", "label": "Sous-titre", "fr": "Cliquez votre samedi d'arrivée, puis votre samedi de départ — le total se calcule automatiquement.", "en": "Click your arrival Saturday, then your departure Saturday — the total is calculated automatically.", "long": true}, {"key": "cal.tag", "label": "Tag", "fr": "Disponibilités", "en": "Availability", "long": false}, {"key": "cal.title", "label": "Titre", "fr": "Choisissez <em>votre créneau</em>", "en": "Choose <em>your dates</em>", "long": false}, {"key": "cal.total", "label": "Total", "fr": "Total", "en": "Total", "long": false}, {"key": "cal.waiting", "label": "Message attente", "fr": "En attente…", "en": "Waiting…", "long": false}, {"key": "cal.warn.booked", "label": "cal.warn.booked", "fr": "Des dates réservées se trouvent dans cette période.", "en": "Booked dates are within this period.", "long": false}, {"key": "cal.warn.min3", "label": "cal.warn.min3", "fr": "Minimum 3 nuits en basse saison (novembre → mars).", "en": "Minimum 3 nights in low season (November → March).", "long": false}, {"key": "cal.warn.satsat", "label": "cal.warn.satsat", "fr": "Séjours du samedi au samedi uniquement en haute et mi-saison.", "en": "Saturday to Saturday stays only in peak and mid season.", "long": true}]}, {"id": "svc", "label": "Services optionnels", "fields": [{"key": "svc.baby.desc", "label": "Lit bébé - description", "fr": "Lit de voyage propre et sécurisé · livré dans la chambre", "en": "Clean, safe travel cot · delivered to the bedroom", "long": false}, {"key": "svc.baby.name", "label": "Lit bébé - nom", "fr": "Lit bébé parapluie", "en": "Travel cot", "long": false}, {"key": "svc.baby.none", "label": "Lit bébé - sans", "fr": "Sans lit bébé", "en": "No travel cot", "long": false}, {"key": "svc.baby.o1", "label": "Lit bébé - option", "fr": "1 lit bébé parapluie", "en": "1 travel cot", "long": false}, {"key": "svc.baby.rc", "label": "Lit bébé - détail ligne ({n}=nuits, {s}=pluriel)", "fr": "Lit bébé × {n} nuit{s}", "en": "Travel cot × {n} night{s}", "long": false}, {"key": "svc.baby.unit", "label": "Lit bébé - unité (/nuit, /night)", "fr": "/nuit", "en": "/night", "long": false}, {"key": "svc.clean.desc", "label": "Ménage - description", "fr": "Nettoyage complet · cuisine, salles de bains, sols, terrasse", "en": "Full clean · kitchen, bathrooms, floors, terrace", "long": false}, {"key": "svc.clean.name", "label": "Ménage - nom", "fr": "Ménage intermédiaire", "en": "Intermediate cleaning", "long": false}, {"key": "svc.clean.none", "label": "Ménage - sans", "fr": "Sans ménage supplémentaire", "en": "No additional cleaning", "long": false}, {"key": "svc.incl", "label": "Inclus", "fr": "Inclus", "en": "Included", "long": false}, {"key": "svc.perpass", "label": "Par passage", "fr": "/passage", "en": "/visit", "long": false}, {"key": "svc.pool.desc", "label": "Piscine - description", "fr": "Bassin, traitement eau, filet & brossage parois", "en": "Basin, water treatment, net & brushing", "long": false}, {"key": "svc.pool.name", "label": "Piscine - nom", "fr": "Nettoyage piscine", "en": "Pool cleaning", "long": false}, {"key": "svc.pool.none", "label": "Piscine - sans", "fr": "Sans nettoyage supplémentaire", "en": "No additional cleaning", "long": false}, {"key": "svc.sub", "label": "Sous-titre", "fr": "Ces services s'ajoutent automatiquement au montant total de votre réservation.", "en": "These services are automatically added to your total.", "long": true}, {"key": "svc.tag", "label": "Tag", "fr": "Services optionnels", "en": "Optional services", "long": false}, {"key": "svc.title", "label": "Titre", "fr": "Personnalisez <em>votre séjour</em>", "en": "Personalise <em>your stay</em>", "long": false}, {"key": "svc.x1clean", "label": "svc.x1clean", "fr": "1 nettoyage", "en": "1 cleaning", "long": false}, {"key": "svc.x1pass", "label": "svc.x1pass", "fr": "1 passage", "en": "1 visit", "long": false}, {"key": "svc.x2clean", "label": "svc.x2clean", "fr": "2 nettoyages", "en": "2 cleanings", "long": false}, {"key": "svc.x2pass", "label": "svc.x2pass", "fr": "2 passages", "en": "2 visits", "long": false}, {"key": "svc.x3clean", "label": "svc.x3clean", "fr": "3 nettoyages", "en": "3 cleanings", "long": false}, {"key": "svc.x3pass", "label": "svc.x3pass", "fr": "3 passages", "en": "3 visits", "long": false}]}, {"id": "recap", "label": "Récapitulatif réservation", "fields": [{"key": "recap.deposit", "label": "recap.deposit", "fr": "Caution (remboursée J+7/10)", "en": "Deposit (refunded D+7/10)", "long": false}, {"key": "recap.menage", "label": "recap.menage", "fr": "Ménage", "en": "Cleaning", "long": false}, {"key": "recap.pass", "label": "recap.pass", "fr": "passage", "en": "visit", "long": false}, {"key": "recap.passes", "label": "recap.passes", "fr": "passages", "en": "visits", "long": false}, {"key": "recap.pay", "label": "recap.pay", "fr": "Confirmer et payer →", "en": "Confirm and pay →", "long": false}, {"key": "recap.piscine", "label": "recap.piscine", "fr": "Piscine", "en": "Pool", "long": false}, {"key": "recap.promo.btn", "label": "Bouton code promo", "fr": "Appliquer", "en": "Apply", "long": false}, {"key": "recap.promo.ph", "label": "Placeholder champ code promo", "fr": "Code promo", "en": "Promo code", "long": false}, {"key": "recap.rent", "label": "recap.rent", "fr": "Loyer TTC", "en": "Rent", "long": false}, {"key": "recap.total", "label": "recap.total", "fr": "Total à payer aujourd'hui", "en": "Total due today", "long": false}]}, {"id": "bk", "label": "Tunnel de réservation", "fields": [{"key": "bk.back", "label": "bk.back", "fr": "← Modifier", "en": "← Edit", "long": false}, {"key": "bk.cancel", "label": "bk.cancel", "fr": "Annuler", "en": "Cancel", "long": false}, {"key": "bk.next", "label": "bk.next", "fr": "Récapitulatif →", "en": "Summary →", "long": false}, {"key": "bk.pay", "label": "bk.pay", "fr": "Payer la caution (1 500 €) →", "en": "Pay deposit (€1,500) →", "long": false}, {"key": "bk.step1.tag", "label": "bk.step1.tag", "fr": "Étape 1 / 3 — Vos coordonnées", "en": "Step 1 / 3 — Your details", "long": false}, {"key": "bk.step1.title", "label": "bk.step1.title", "fr": "Informations du locataire", "en": "Tenant information", "long": false}, {"key": "bk.payment.info", "label": "Texte paiement / remboursement (étape 2)", "fr": "Le loyer sera débité automatiquement 30 jours avant votre arrivée.<br>La caution sera remboursée sous 7 à 10 jours après votre départ.", "en": "The rent will be automatically debited 30 days before your arrival.<br>The deposit will be refunded within 7 to 10 days after your departure.", "long": true}]}, {"id": "tenant", "label": "Formulaire locataire", "fields": [{"key": "tenant.addr", "label": "tenant.addr", "fr": "Adresse *", "en": "Address *", "long": false}, {"key": "tenant.city", "label": "tenant.city", "fr": "Ville *", "en": "City *", "long": false}, {"key": "tenant.country", "label": "tenant.country", "fr": "Pays *", "en": "Country *", "long": false}, {"key": "tenant.email", "label": "tenant.email", "fr": "Email *", "en": "Email *", "long": false}, {"key": "tenant.fname", "label": "tenant.fname", "fr": "Prénom *", "en": "First name *", "long": false}, {"key": "tenant.guests", "label": "Composition du groupe (titre)", "fr": "Composition du groupe * (8 personnes max.)", "en": "Group composition * (max. 8 people)", "long": false}, {"key": "tenant.lname", "label": "tenant.lname", "fr": "Nom *", "en": "Last name *", "long": false}, {"key": "tenant.phone", "label": "tenant.phone", "fr": "Téléphone *", "en": "Phone *", "long": false}, {"key": "tenant.zip", "label": "tenant.zip", "fr": "Code postal *", "en": "Post code *", "long": false}, {"key": "tenant.adults", "label": "Formulaire - Adultes (label)", "fr": "Adultes (18+) *", "en": "Adults (18+) *", "long": false}, {"key": "tenant.children", "label": "Formulaire - Enfants (label)", "fr": "Enfants (0–17)", "en": "Children (0–17)", "long": false}, {"key": "tenant.children.ages", "label": "Formulaire - Âges enfants (label)", "fr": "Âge(s) des enfants *", "en": "Child age(s) *", "long": false}]}, {"id": "avis", "label": "Section Avis clients", "fields": [{"key": "avis.avg", "label": "Note moyenne", "fr": "Note moyenne", "en": "Average rating", "long": false}, {"key": "avis.c.clean", "label": "avis.c.clean", "fr": "Propreté", "en": "Cleanliness", "long": false}, {"key": "avis.c.comfort", "label": "avis.c.comfort", "fr": "Confort", "en": "Comfort", "long": false}, {"key": "avis.c.loc", "label": "avis.c.loc", "fr": "Situation", "en": "Location", "long": false}, {"key": "avis.c.vfm", "label": "avis.c.vfm", "fr": "Qualité-Prix", "en": "Value", "long": false}, {"key": "avis.count", "label": "Nombre avis", "fr": "9 avis clients", "en": "9 guest reviews", "long": false}, {"key": "avis.q1", "label": "Citation 1", "fr": "\"Un endroit hors du temps. La lumière du Luberon au coucher du soleil depuis la terrasse est simplement inoubliable.\"", "en": "\"A timeless place. The light of the Luberon at sunset from the terrace is simply unforgettable.\"", "long": true}, {"key": "avis.q2", "label": "Citation 2", "fr": "\"Jamais trouvé cet équilibre entre exotisme dépaysant et familiarité du terroir. Une œuvre, vraiment.\"", "en": "\"Never found this balance between exotic escapism and the familiarity of the terroir. A true work of art.\"", "long": true}, {"key": "avis.q3", "label": "Citation 3", "fr": "\"Les oliviers centenaires, le bassin zen, les cigales... Un ressourcement complet. On revient l'année prochaine.\"", "en": "\"The century-old olive trees, the zen basin, the cicadas... A complete recharge. We're coming back next year.\"", "long": true}, {"key": "avis.t.arch", "label": "avis.t.arch", "fr": "Architecture", "en": "Architecture", "long": false}, {"key": "avis.t.calm", "label": "avis.t.calm", "fr": "Calme", "en": "Peaceful", "long": false}, {"key": "avis.t.deco", "label": "avis.t.deco", "fr": "Décoration", "en": "Decor", "long": false}, {"key": "avis.t.garden", "label": "avis.t.garden", "fr": "Jardin", "en": "Garden", "long": false}, {"key": "avis.t.kitchen", "label": "avis.t.kitchen", "fr": "Cuisine", "en": "Kitchen", "long": false}, {"key": "avis.t.loc", "label": "avis.t.loc", "fr": "Situation", "en": "Location", "long": false}, {"key": "avis.t.pool", "label": "avis.t.pool", "fr": "Piscine", "en": "Pool", "long": false}, {"key": "avis.t.terrace", "label": "avis.t.terrace", "fr": "Terrasse", "en": "Terrace", "long": false}, {"key": "avis.tag", "label": "Tag", "fr": "Ce qu'ils en disent", "en": "What our guests say", "long": false}, {"key": "avis.title", "label": "Titre", "fr": "Nos hôtes <em>témoignent</em>", "en": "Our guests <em>speak</em>", "long": false}]}, {"id": "contact", "label": "Section Contact", "fields": [{"key": "contact.alert", "label": "contact.alert", "fr": "Merci de remplir au minimum votre prénom, email et message.", "en": "Please fill in at least your first name, email and message.", "long": false}, {"key": "contact.email", "label": "contact.email", "fr": "Email", "en": "Email", "long": false}, {"key": "contact.fname", "label": "contact.fname", "fr": "Prénom", "en": "First name", "long": false}, {"key": "contact.fname.ph", "label": "contact.fname.ph", "fr": "Marie", "en": "Marie", "long": false}, {"key": "contact.lname", "label": "contact.lname", "fr": "Nom", "en": "Last name", "long": false}, {"key": "contact.lname.ph", "label": "contact.lname.ph", "fr": "Dupont", "en": "Dupont", "long": false}, {"key": "contact.message", "label": "contact.message", "fr": "Message", "en": "Message", "long": false}, {"key": "contact.message.ph", "label": "contact.message.ph", "fr": "Décrivez votre projet de séjour…", "en": "Describe your stay project…", "long": false}, {"key": "contact.phone", "label": "contact.phone", "fr": "Téléphone", "en": "Phone", "long": false}, {"key": "contact.phone.ph", "label": "contact.phone.ph", "fr": "6 00 00 00 00", "en": "6 00 00 00 00", "long": false}, {"key": "contact.send", "label": "Bouton envoyer", "fr": "Envoyer le message →", "en": "Send message →", "long": false}, {"key": "contact.sent", "label": "Confirmation", "fr": "Message envoyé", "en": "Message sent", "long": false}, {"key": "contact.sent.sub", "label": "Sous-message", "fr": "Nous vous répondrons dans les 24 heures.<br>À bientôt au Petit Virevent.", "en": "We will reply within 24 hours.<br>See you soon at Le Petit Virevent.", "long": true}, {"key": "contact.subject", "label": "contact.subject", "fr": "Sujet", "en": "Subject", "long": false}, {"key": "contact.subject.choose", "label": "contact.subject.choose", "fr": "Choisir…", "en": "Choose…", "long": false}, {"key": "contact.subject.o1", "label": "contact.subject.o1", "fr": "Demande de disponibilités", "en": "Availability enquiry", "long": false}, {"key": "contact.subject.o2", "label": "contact.subject.o2", "fr": "Question sur la villa", "en": "Question about the villa", "long": false}, {"key": "contact.subject.o3", "label": "contact.subject.o3", "fr": "Devis personnalisé", "en": "Custom quote", "long": false}, {"key": "contact.subject.o4", "label": "contact.subject.o4", "fr": "Services complémentaires", "en": "Additional services", "long": false}, {"key": "contact.subject.o5", "label": "contact.subject.o5", "fr": "Autre", "en": "Other", "long": false}, {"key": "contact.tag", "label": "Tag", "fr": "Nous écrire", "en": "Get in touch", "long": false}, {"key": "contact.title", "label": "Titre", "fr": "Une question,<br>une envie de <em>réserver</em> ?", "en": "A question,<br>or ready to <em>book</em>?", "long": false}]}, {"id": "footer", "label": "Footer", "fields": [{"key": "footer.copy", "label": "Copyright / baseline footer", "fr": "© 2026 · Bonnieux · Luberon · Provence", "en": "© 2026 · Bonnieux · Luberon · Provence", "long": false}, {"key": "footer.contact", "label": "Contact", "fr": "Contact", "en": "Contact", "long": false}, {"key": "footer.insta", "label": "Instagram", "fr": "Instagram", "en": "Instagram", "long": false}, {"key": "footer.legal", "label": "Mentions légales", "fr": "Mentions légales", "en": "Legal notice", "long": false}, {"key": "footer.partners", "label": "Partenaires", "fr": "Nos partenaires", "en": "Our partners", "long": false}, {"key": "footer.terms", "label": "CGV", "fr": "CGV", "en": "T&Cs", "long": false}]}]
+</script>
+
+</body>
+</html>
